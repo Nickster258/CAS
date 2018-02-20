@@ -33,6 +33,7 @@
 	<div class="middle">
 		<div class="inner">
 			<?php
+				session_start();
 				if(isset($_SESSION["uuid"]) && isset($_SESSION["token"])) {
 	
 					echo "<p>Register</br></br>
