@@ -32,13 +32,29 @@
 <div class="outer">
 	<div class="middle">
 		<div class="inner">
-			<p>Login</br></br>
-				<form action=\"register.php\" method=\"post\">
+			<?php
+				if(isset($_SESSION["uuid"]) && isset($_SESSION["token"])) {
+	
+					echo "<p>Register</br></br>
+					<form action=\"register.php\" method=\"post\">
+					UUID: " . $_SESSION["uuid"] . "
 					Name: <input type=\"text\" name=\"name\"><br>
+					Email: <input type=\"email\" name=\"email\"><br>
+					Password: <input type=\"password\" name=\"pass\"><br>
+					Verify password: <input type=\"password\" name=\"verifiedpass\"><br>
+					<input type=\"submit\">
+					</form>
+					</p>";
+				} else {
+					echo "<p>Login</br></br>
+					<form action=\"login.php\" method=\"post\">
+					Email: <input type=\"email\" name=\"email\"><br>
 					Password: <input type=\"password\" name=\"pass\"><br>
 					<input type=\"submit\">
-				</form>
-			</p>
+					</form>
+					</p>";
+				}
+			?>
 		</div>
 	</div>
 </div>

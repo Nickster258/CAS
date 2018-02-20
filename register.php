@@ -2,6 +2,8 @@
 require __DIR__ . '/constants.php';
 require __DIR__ . '/random.php';
 
+session_start();
+
 $conn = mysql_connect($dbhost, $dbuser, $dbpass);
 
 mysql_select_db($db, $conn);
