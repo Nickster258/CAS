@@ -13,16 +13,17 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60))";
+	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), mUuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60))";
 	$result = mysql_query($query, $conn);
 }
 
-function registerUser($uid, $name, $hash, $salt, $email) {
+function registerUser($mUuid, $name, $hash, $salt, $email) {
 	global $conn;
 	$emailToken = random(16, "rand");
-	$query = "INSERT INTO users_unverified(uid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\")";
+	$uid = random(16, "uid");
+	$query = "INSERT INTO users_unverified(uid, mUuid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$mUuid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\")";
 	$result = mysql_query($query, $conn);
-	$queryToken = "INSERT INTO email_tokens(uid, emailToken) VALUES (\"$uid\", \"$emailToken\")";
+	$queryToken = "INSERT INTO email_tokens(uid, email, emailToken) VALUES (\"$uid\", \"$email\", \"$emailToken\")";
 	if ($result) {
 		sendVerificationEmail($email, $emailToken);
 	} else {
@@ -57,7 +58,7 @@ function isValidPass($pass) {
 }
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
-	if (isset($_SESSION["uuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verifiedpass"])) {
+	if (isset($_SESSION["mUuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verifiedpass"])) {
 		$validName = isValidName($_POST["name"]);
 		$validEmail = isValidEmail($_POST["email"]);
 		$validPass = isValidPass($_POST["pass"]);
@@ -70,7 +71,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$_SESSION["name"] = $validName;
 				$_SESSION["email"] = $validEmail;
 				$_SESSION["pass"] = $validPass;
-				registerUser($uid, $name, $hash, $email, $salt);
+				registerUser($mUuid, $name, $hash, $email, $salt);
 			} else {
 				echo "Your passwords do not match!";
 				die();
@@ -83,8 +84,8 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$token = $_GET["token"];
 		$_SESSION["token"] = $token;
 		if (preg_math('/[a-z]/i', $token) && isValidToken($token)) {
-			$uuid = getUuid($token);
-			$_SESSION["uuid"] = $uuid;
+			$mUuid = getmUuid($token);
+			$_SESSION["mUuid"] = $mUuid;
 			$location = "Location: " . $URL . "register.php";
 			header ($location);
 		}
