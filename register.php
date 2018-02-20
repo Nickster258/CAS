@@ -13,7 +13,7 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(8), email VARCHAR(60))";
+	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60))";
 	$result = mysql_query($query, $conn);
 }
 
@@ -40,7 +40,7 @@ function getUserDetails($uid) {
 }
 
 function getSalt() {
-	return random(8, "rand");
+	return random($saltLength, "rand");
 }
 
 function getHash($password, $salt) {
