@@ -17,15 +17,20 @@ if(!$conn) {
 	$result = mysql_query($query, $conn);
 }
 
-function registerUser($uid, $name, $hash, $email, $salt) {
+function registerUser($uid, $name, $hash, $salt, $email) {
 	global $conn;
-	$query = "INSERT INTO users_unverified(uid, username, password, salt, email) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\")";
+	$emailToken = random(16, "rand");
+	$query = "INSERT INTO users_unverified(uid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\")";
 	$result = mysql_query($query, $conn);
+	$queryToken = "INSERT INTO email_tokens(uid, emailToken) VALUES (\"$uid\", \"$emailToken\")";
 	if ($result) {
-		return $uid;
+		sendVerificationEmail($email, $emailToken);
 	} else {
 		return false;
 	}
+}
+
+function sendVerificationEmail($email, $emailToken) {
 }
 
 function getUserDetails($uid) {
