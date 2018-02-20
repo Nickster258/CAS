@@ -1,3 +1,5 @@
 /var/www/stonecipher.org/dev/private/testauth/constants.php
 public/app/constants.php
 public/app/.gitignore
+.gitignore
+cconstants.php
