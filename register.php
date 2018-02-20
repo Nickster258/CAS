@@ -13,7 +13,7 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), mUuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60))";
+	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), mUuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60), verified BOOLEAN)";
 	$result = mysql_query($query, $conn);
 }
 
@@ -21,7 +21,7 @@ function registerUser($mUuid, $name, $hash, $salt, $email) {
 	global $conn;
 	$emailToken = random(16, "rand");
 	$uid = random(16, "uid");
-	$query = "INSERT INTO users_unverified(uid, mUuid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$mUuid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\")";
+	$query = "INSERT INTO users(uid, mUuid, username, password, salt, email, emailToken, verified) VALUES(\"$uid\", \"$mUuid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\", false)";
 	$result = mysql_query($query, $conn);
 	$queryToken = "INSERT INTO email_tokens(uid, email, emailToken) VALUES (\"$uid\", \"$email\", \"$emailToken\")";
 	if ($result) {
