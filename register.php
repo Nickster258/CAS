@@ -17,9 +17,9 @@ if(!$conn) {
 	$result = mysql_query($query, $conn);
 }
 
-function addUser($uid, $username, $hash, $salt) {
+function registerUser($uid, $name, $hash, $email, $salt) {
 	global $conn;
-	$query = "INSERT INTO users(uid, username, password, salt, email) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\")";
+	$query = "INSERT INTO users_unverified(uid, username, password, salt, email) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\")";
 	$result = mysql_query($query, $conn);
 	if ($result) {
 		return $uid;
@@ -32,23 +32,6 @@ function getUserDetails($uid) {
 	global $conn;
 	$query = "SELECT * FROM users WHERE uid = binary \"$uid\"";
 	$result = mysql_query($query, $conn);
-	
-
-}
-
-function generateUid() {
-	global $conn;
-	while (true) {
-		$randUid = random(32, "uid");
-		$query = "SELECT * FROM users WHERE uid = binary \"$randUid\"";
-		$result = mysql_query($query, $conn);
-
-		if (!$result) {
-			die(mysql_error());
-		} elseif (mysql_num_rows($result)==0) {
-			return $randUid;
-		}
-	}
 }
 
 function getSalt() {
@@ -61,31 +44,39 @@ function getHash($password, $salt) {
 
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
-	if (isset($_GET["token"])) {
+	if (isset($_SESSION["uuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verifiedpass"])) {
+		$validName = isValidName($_POST["name"]);
+		$validEmail = isValidEmail($_POST["email"]);
+		$validPass = isValidPass($_POST["pass"]);
+		$validPassVerified = isValidPass($_POST["verifiedpass"]);
+		if ($validName && $validEmail && $validPass && $validPassVerified) {
+			$salt = getSalt();
+			$hashedPass = getHash($validPass, $salt);
+			$hashedPassVerified = getHash($validPassVerified, $salt);
+			if ($hashedPass != $hashedPassVerified) {
+				$_SESSION["name"] = $validName;
+				$_SESSION["email"] = $validEmail;
+				$_SESSION["pass"] = $validPass;
+				registerUser($uid, $name, $hash, $email, $salt);
+			} else {
+				echo "Your passwords do not match!";
+				die();
+			}
+		} else {
+			echo "Oh no, something is formatted! wrong";
+			die();
+		}
+	} else if (isset($_GET["token"])) {
 		$token = $_GET["token"];
+		$_SESSION["token"] = $token;
 		if (preg_math('/[a-z]/i', $token) && isValidToken($token)) {
 			$uuid = getUuid($token);
-			
+			$_SESSION["uuid"] = $uuid;
+			$location = "Location: " . $URL . "register.php";
+			header ($location);
 		}
 	} else {
-		echo "what";
 		die();
 	}
 }	
-//} else {
-//	if (isset($argv[1], $argv[2])) {
-//		$pass = $argv[1];
-//		$name = $argv[2];
-//
-//		$uid = getUid();
-//		$salt = getSalt();
-//		$hash = getHash($pass, $salt);
-//
-//		addUser($uid, $name, $hash, $salt);
-//
-//	} else {
-//		echo "what";
-//		die();
-//	}
-//}
 ?>
