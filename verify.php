@@ -23,7 +23,7 @@ function verifyUser($uid) {
 	$result = mysql_query($query, $conn);
 	if ($result) {
 		
-		$query = "INSERT INTO users_unverified(uid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\")";
+		$query = "INSERT INTO users_unverified(uid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$email_token\")";
 		$result = mysql_query($query, $conn);
 		if ($result) {
 			return true;
@@ -37,10 +37,10 @@ function verifyUser($uid) {
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_GET["token"])) {
-		$emailToken = $_GET["token"];
-		$_SESSION["emailToken"] = $emailToken;
-		if (preg_math('/[a-z]/i', $emailToken) && isValidToken($emailToken)) {
-			$uid = verifyToken($emailToken);
+		$email_token = $_GET["token"];
+		$_SESSION["emailToken"] = $email_token;
+		if (preg_math('/[a-z]/i', $email_token) && isValidToken($email_token)) {
+			$uid = verifyToken($email_token);
 			if($uid != false) {
 				if (verifyUser($uid)) {
 					echo "Your account has been verified!";

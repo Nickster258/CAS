@@ -13,25 +13,25 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), mUuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$saltLength\"), email VARCHAR(60), verified BOOLEAN)";
+	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(\"$salt_length\"), email VARCHAR(60), verified BOOLEAN)";
 	$result = mysql_query($query, $conn);
 }
 
-function registerUser($mUuid, $name, $hash, $salt, $email) {
+function registerUser($m_uuid, $name, $hash, $salt, $email) {
 	global $conn;
 	$emailToken = random(16, "rand");
 	$uid = random(16, "uid");
 	$query = "INSERT INTO users(uid, mUuid, username, password, salt, email, emailToken, verified) VALUES(\"$uid\", \"$mUuid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$emailToken\", false)";
 	$result = mysql_query($query, $conn);
-	$queryToken = "INSERT INTO email_tokens(uid, email, emailToken) VALUES (\"$uid\", \"$email\", \"$emailToken\")";
+	$query_token = "INSERT INTO email_tokens(uid, email, emailToken) VALUES (\"$uid\", \"$email\", \"$email_token\")";
 	if ($result) {
-		sendVerificationEmail($email, $emailToken);
+		sendVerificationEmail($email, $email_token);
 	} else {
 		return false;
 	}
 }
 
-function sendVerificationEmail($email, $emailToken) {
+function sendVerificationEmail($email, $email_token) {
 }
 
 function getUserDetails($uid) {
@@ -41,7 +41,7 @@ function getUserDetails($uid) {
 }
 
 function getSalt() {
-	return random($saltLength, "rand");
+	return random($salt_length, "rand");
 }
 
 function getHash($password, $salt) {
@@ -59,18 +59,18 @@ function isValidPass($pass) {
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_SESSION["mUuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verifiedpass"])) {
-		$validName = isValidName($_POST["name"]);
-		$validEmail = isValidEmail($_POST["email"]);
-		$validPass = isValidPass($_POST["pass"]);
-		$validPassVerified = isValidPass($_POST["verifiedpass"]);
-		if ($validName && $validEmail && $validPass && $validPassVerified) {
+		$valid_name = isValidName($_POST["name"]);
+		$valid_email = isValidEmail($_POST["email"]);
+		$valid_pass = isValidPass($_POST["pass"]);
+		$valid_pass_verified = isValidPass($_POST["verifiedpass"]);
+		if ($valid_name && $valid_email && $valid_pass && $valid_pass_verified) {
 			$salt = getSalt();
-			$hashedPass = getHash($validPass, $salt);
-			$hashedPassVerified = getHash($validPassVerified, $salt);
-			if ($hashedPass != $hashedPassVerified) {
-				$_SESSION["name"] = $validName;
-				$_SESSION["email"] = $validEmail;
-				$_SESSION["pass"] = $validPass;
+			$hashed_pass = getHash($valid_pass, $salt);
+			$hashed_pass_verified = getHash($valid_pass_verified, $salt);
+			if ($hashed_pass != $hashed_pass_verified) {
+				$_SESSION["name"] = $valid_name;
+				$_SESSION["email"] = $valid_email;
+				$_SESSION["pass"] = $valid_pass;
 				registerUser($mUuid, $name, $hash, $email, $salt);
 			} else {
 				echo "Your passwords do not match!";
