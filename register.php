@@ -42,6 +42,14 @@ function getHash($password, $salt) {
 	return password_hash($password . $salt, PASSWORD_BCRYPT);
 }
 
+function isValidName($name) {
+}
+
+function isValidEmail($email) {
+}
+
+function isValidPass($pass) {
+}
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_SESSION["uuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verifiedpass"])) {
