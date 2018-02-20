@@ -11,13 +11,13 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(16), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(8))";
+	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(8), email VARCHAR(60))";
 	$result = mysql_query($query, $conn);
 }
 
 function addUser($uid, $username, $hash, $salt) {
 	global $conn;
-	$query = "INSERT INTO users(uid, username, password, salt) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\")";
+	$query = "INSERT INTO users(uid, username, password, salt, email) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\")";
 	$result = mysql_query($query, $conn);
 	if ($result) {
 		return $uid;
@@ -34,10 +34,10 @@ function getUserDetails($uid) {
 
 }
 
-function getUid() {
+function generateUid() {
 	global $conn;
 	while (true) {
-		$randUid = random(16, "uid");
+		$randUid = random(32, "uid");
 		$query = "SELECT * FROM users WHERE uid = binary \"$randUid\"";
 		$result = mysql_query($query, $conn);
 
@@ -59,39 +59,31 @@ function getHash($password, $salt) {
 
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
-	if (isset($_POST["pass"], $_POST["name"])) {
-		$pass = $_POST["pass"];
-		$name = $_POST["name"];
-
-		$uid = getUid();
-		$salt = getSalt();
-		$hash = getHash($pass, $salt);
-
-		$result = addUser($uid, $name, $hash, $salt);
-		if ($result != false) {
-			echo getUserDetails($result);
-		} else {
-			echo "uhoh";
+	if (isset($_GET["token"])) {
+		$token = $_GET["token"];
+		if (preg_math('/[a-z]/i', $token) && isValidToken($token)) {
+			$uuid = getUuid($token);
+			
 		}
-
 	} else {
 		echo "what";
 		die();
 	}
-} else {
-	if (isset($argv[1], $argv[2])) {
-		$pass = $argv[1];
-		$name = $argv[2];
-
-		$uid = getUid();
-		$salt = getSalt();
-		$hash = getHash($pass, $salt);
-
-		addUser($uid, $name, $hash, $salt);
-
-	} else {
-		echo "what";
-		die();
-	}
-}
+}	
+//} else {
+//	if (isset($argv[1], $argv[2])) {
+//		$pass = $argv[1];
+//		$name = $argv[2];
+//
+//		$uid = getUid();
+//		$salt = getSalt();
+//		$hash = getHash($pass, $salt);
+//
+//		addUser($uid, $name, $hash, $salt);
+//
+//	} else {
+//		echo "what";
+//		die();
+//	}
+//}
 ?>
