@@ -22,10 +22,9 @@ function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_
 	$query = "REPLACE INTO users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
         $prepared_query = $handle->prepare($query);
 	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email);
-        $query_token = "INSERT INTO email_tokens(uid, email, email_token) VALUES (?
-	, ?, ?)";
+        $query_token = "REPLACE INTO email_tokens(uid, email, email_token) VALUES (?, ?, ?)";
 	$prepared_query_token = $handle->prepare($query_token);
-	$prepared_query->execute(array($uid, $email, $email_token);
+	$prepared_query->execute(array($uid, $email, $email_token));
 }
 
 function send_verification_email($email, $email_token) {
