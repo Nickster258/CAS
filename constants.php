@@ -1,8 +1,8 @@
 <?php
-$dbhost = 'localhost:3036';
+$dbhost = 'localhost';
 $dbuser = 'dbuser';
 $dbpass = 'dbpass';
-$db = 'databasename';
+$dbname = 'databasename';
 $salt_length = 16;
 $email_token_length = 16;
 ?>

@@ -1,50 +1,39 @@
 <?php
 require __DIR__ . '/constants.php';
 require __DIR__ . '/random.php';
+require __DIR__ . '/connect.php';
 
 session_start();
 
-$conn = mysql_connect($dbhost, $dbuser, $dbpass);
-
-mysql_select_db($db, $conn);
-
-if(!$conn) {
-	die(mysql_error());
-	echo "hi";
-} else {
-	global $conn;
-}
-
 function register_user($m_uuid, $name, $hash, $salt, $email) {
-	global $conn;
 	$email_token = random(16, "rand");
 	$uid = random(16, "uid");
-	$escaped_name = mysql_real_escape_string($name);
-	$escaped_email = mysql_real_escape_string($email);
-	$query = "INSERT INTO users(uid, m_uuid, username, password, salt, email, emailToken, verified) VALUES(\"$uid\", \"$m_uuid\", \"$escaped_name\", \"$hash\", \"$salt\", \"$escaped_email\", \"$email_token\", false)";
-	$result = mysql_query($query, $conn);
-	$query_token = "INSERT INTO email_tokens(uid, email, emailToken) VALUES (\"$uid\", \"$email\", \"$email_token\")";
-	if ($result) {
-		send_verification_email($email, $email_token);
-	} else {
-		return false;
-	}
+	set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+}
+
+function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
+	$query = "REPLACE INTO users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
+        $prepared_query = $handle->prepare($query);
+	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email);
+        $query_token = "INSERT INTO email_tokens(uid, email, email_token) VALUES (?
+	, ?, ?)";
+	$prepared_query_token = $handle->prepare($query_token);
+	$prepared_query->execute(array($uid, $email, $email_token);
 }
 
 function send_verification_email($email, $email_token) {
 }
 
 function get_user_details($uid) {
-	global $conn;
-	$query = "SELECT * FROM users WHERE uid = binary \"$uid\"";
-	$result = mysql_query($query, $conn);
+	$query = $handle->query("SELECT * FROM users WHERE uid = binary ?");
+	return $query;
 }
 
 function get_salt() {
 	return random($salt_length, "rand");
 }
 
-function get_hash($password, $salt) {
+function get_hashed($password, $salt) {
 	return password_hash($password . $salt, PASSWORD_BCRYPT);
 }
 
@@ -84,8 +73,8 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$valid_pass_verified = is_valid_pass($_POST["verified_pass"]);
 		if (!$valid_name && !$valid_email && !$valid_pass && !$valid_pass_verified) {
 			$salt = get_salt();
-			$hashed_pass = get_hash($valid_pass, $salt);
-			$hashed_pass_verified = get_hash($valid_pass_verified, $salt);
+			$hashed_pass = get_hashed($valid_pass, $salt);
+			$hashed_pass_verified = get_hashed($valid_pass_verified, $salt);
 			if ($hashed_pass != $hashed_pass_verified) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
