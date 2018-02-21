@@ -7,8 +7,15 @@ session_start();
 
 function register_user($m_uuid, $name, $hash, $salt, $email) {
 	$email_token = random(16, "rand");
-	$uid = random(16, "uid");
-	set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+	$uid = get_unique_id(random(16, "uid"));
+	if (is_not_registered($m_uuid, $name, $email)) {
+		set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+	} else {
+		echo "That Mojang UUID, Name, or email has already been registered";
+	}
+}
+
+function is_not_registered($m_uuid, $name, $email) {
 }
 
 function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
