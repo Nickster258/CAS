@@ -16,6 +16,36 @@ function register_user($m_uuid, $name, $hash, $salt, $email) {
 }
 
 function is_not_registered($m_uuid, $name, $email) {
+	if (exists($m_uuid, "m_uuid") || exists($name, "name") || exists($email, "email")) {
+		return false;
+	}
+	return true;
+}
+
+function exists($value, $type) {
+	if (strcmp($type, "m_uuid") === 0) {
+		$query = $handle->prepare("SELECT m_uuid FROM auth_users WHERE m_uuid = binary " . $value);
+		$query->execute();
+		$query->fetch(PDO::FETCH_ASSOC);
+		if ($query->rowCount() > 0) {
+			return true;
+		}
+	} else if (strcmp($type, "name") === 0) {
+		$query = $handle->prepare("SELECT name FROM auth_users WHERE name = binary " . $value);
+		$query->execute();
+		$query->fetch(PDO::FETCH_ASSOC);
+		if ($query->rowCount() > 0) {
+			return true;
+		}
+	} else if (strcmp($type, "email") === 0) {
+		$query = $handle->prepare("SELECT email FROM auth_users WHERE email = binary " . $value);
+		$query->execute();
+		$query->fetch(PDO::FETCH_ASSOC);
+		if ($query->rowCount() > 0) {
+			return true;
+		}
+	}
+	return false;	
 }
 
 function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
