@@ -13,36 +13,25 @@ if(!$conn) {
 	echo "hi";
 } else {
 	global $conn;
-	$query = "CREATE TABLE IF NOT EXISTS users(uid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(8), email VARCHAR(60))";
+}
+
+function verify_user($uid) {
+	global $conn;
+	$query = "UPDATE auth_users SET verified = 1 WHERE uid = \"$uid\"";
 	$result = mysql_query($query, $conn);
 }
 
-function verifyUser($uid) {
-	global $conn;
-	$query = "SELECT * FROM users_unverified WHERE uid = binary \"$uid\"";
-	$result = mysql_query($query, $conn);
-	if ($result) {
-		
-		$query = "INSERT INTO users_unverified(uid, username, password, salt, email, emailToken) VALUES(\"$uid\", \"$username\", \"$hash\", \"$salt\", \"$email\", \"$email_token\")";
-		$result = mysql_query($query, $conn);
-		if ($result) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
+function is_valid_token($email_token) {
 }
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_GET["token"])) {
 		$email_token = $_GET["token"];
-		$_SESSION["emailToken"] = $email_token;
-		if (preg_math('/[a-z]/i', $email_token) && isValidToken($email_token)) {
-			$uid = verifyToken($email_token);
+		$_SESSION["email_token"] = $email_token;
+		if (preg_math('/[a-z]/i', $email_token) && is_valid_token($email_token)) {
+			$uid = verify_token($email_token);
 			if($uid != false) {
-				if (verifyUser($uid)) {
+				if (verify_user($uid)) {
 					echo "Your account has been verified!";
 				} else {
 					echo "Verification failure. Blame capo.";

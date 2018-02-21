@@ -38,11 +38,11 @@
 	
 					echo "<p>Register</br></br>
 					<form action=\"register.php\" method=\"post\">
-					UUID: " . $_SESSION["uuid"] . "
+					Mojang UUID: " . $_SESSION["m_uuid"] . "
 					Name: <input type=\"text\" name=\"name\"><br>
 					Email: <input type=\"email\" name=\"email\"><br>
 					Password: <input type=\"password\" name=\"pass\"><br>
-					Verify password: <input type=\"password\" name=\"verifiedpass\"><br>
+					Verify password: <input type=\"password\" name=\"verified_pass\"><br>
 					<input type=\"submit\">
 					</form>
 					</p>";

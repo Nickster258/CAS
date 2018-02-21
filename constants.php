@@ -3,5 +3,6 @@ $dbhost = 'localhost:3036';
 $dbuser = 'dbuser';
 $dbpass = 'dbpass';
 $db = 'databasename';
-$saltLength = 16;
+$salt_length = 16;
+$email_token_length = 16;
 ?>
