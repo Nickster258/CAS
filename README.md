@@ -7,9 +7,10 @@ The end-goal in this project is to ease the headaches that administration can ha
 
 ### To Do
 - [X] Structure verify.php
-- [ ] Setup PDO and purge all other db handlers
-- [ ] Setup parameterized mysql statements
+- [X] Setup PDO and purge all other db handlers
+- [X] Setup parameterized mysql statements
 - [ ] Implement the mailing function
-- [ ] Implement the setup script
+- [X] Implement the setup script
 - [ ] Finalize table structure
+- [ ] Make it work
 - [ ] Prettify the UI
