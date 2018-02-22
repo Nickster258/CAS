@@ -20,7 +20,7 @@ class DatabaseHandler {
 			if($result) {
 				return true;
 			}
-		} else if (strcmp($type, "name") === 0 {
+		} else if (strcmp($type, "name") === 0) {
 			$query = $this->pdo->prepare('SELECT name FROM auth_users WHERE name = :name');
 			$query->bindParam(':name', $value);
 			$query->execute();
@@ -125,6 +125,17 @@ class DatabaseHandler {
 		$query = $this->pdo->prepare('REMOVE FROM auth_tokens WHERE token = :token');
 		$query->bindParam(':token', $token);
 		$query->execute();
+	}
+
+	public function setup() {
+		try {
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(16), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(16), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
+			return "Successfully setup the database.";
+		} catch (PDOException $e) {
+			return $e->getMessage();
+		}
 	}
 }
 

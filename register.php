@@ -8,11 +8,11 @@ $handler = new DatabaseHandler($pdo);
 
 session_start();
 
-function register_new_user($m_uuid, $name, $hash, $salt, $email) {
+function register_new_user($m_uuid, $name, $hash, $email) {
 	$email_token = get_unique_token();
 	$uid = get_unique_id();
 	if (is_not_registered($m_uuid, $name, $email)) {
-		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
 		echo "That Mojang UUID, Name, or email has already been registered";
@@ -52,12 +52,8 @@ function send_verification_email($email, $email_token) {
 
 }
 
-function get_salt() {
-	return Random->random($salt_length, "rand");
-}
-
-function get_hashed($password, $salt) {
-	return password_hash($password . $salt, PASSWORD_BCRYPT);
+function get_hashed($password) {
+	return password_hash($password, PASSWORD_BCRYPT);
 }
 
 function is_valid_name($name) {
@@ -88,14 +84,13 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$valid_pass = is_valid_pass($_POST["pass"]);
 		$valid_pass_verified = is_valid_pass($_POST["verified_pass"]);
 		if (!$valid_name && !$valid_email && !$valid_pass && !$valid_pass_verified) {
-			$salt = get_salt();
-			$hashed_pass = get_hashed($valid_pass, $salt);
-			$hashed_pass_verified = get_hashed($valid_pass_verified, $salt);
+			$hashed_pass = get_hashed($valid_pass);
+			$hashed_pass_verified = get_hashed($valid_pass_verified);
 			if ($hashed_pass != $hashed_pass_verified) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
 				$_SESSION["pass"] = $valid_pass;
-				register_new_user($m_uuid, $name, $hash, $email, $salt);
+				register_new_user($m_uuid, $name, $hash, $email);
 			} else {
 				echo "Your passwords do not match!";
 				die();
