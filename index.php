@@ -34,7 +34,7 @@
 		<div class="inner">
 			<?php
 				session_start();
-				if(isset($_SESSION["uuid"]) && isset($_SESSION["token"])) {
+				if(isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 	
 					echo "<p>Register</br></br>
 					<form action=\"register.php\" method=\"post\">

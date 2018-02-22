@@ -52,7 +52,7 @@ function exists($value, $type) {
 function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
 	$query = "REPLACE INTO auth_users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
         $prepared_query = $handle->prepare($query);
-	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email);
+	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email));
         $query_token = "REPLACE INTO auth_emailtokens(uid, email, email_token) VALUES (?, ?, ?)";
 	$prepared_query_token = $handle->prepare($query_token);
 	$prepared_query->execute(array($uid, $email, $email_token));
@@ -80,13 +80,19 @@ function get_hashed($password, $salt) {
 }
 
 function get_muuid($token) {
-	$query = $handle->prepare("SELECT m_uuid FROM auth_tokens WHERE token = binary ?");
-	$query->execute($token);
-	$query->fetch(PDO::FETCH_ASSOC);
-	if ($query->rowCount() > 0) {
-		return $query['m_uuid'];
+	global $handle;
+	try {
+		$query = $handle->prepare('SELECT m_uuid FROM auth_tokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['m_uuid'];
+		}
+		return false;
+	} catch (PDOException $e) {
+		echo $e->getMessage();
 	}
-	return false;
 }
 
 function is_valid_name($name) {
@@ -139,11 +145,16 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 	} else if (isset($_GET["token"])) {
 		$token = $_GET["token"];
 		$_SESSION["token"] = $token;
-		if (preg_match('/[a-z]/i', $token) && is_valid_token($token)) {
-			$mUuid = get_muuid($token);
-			$_SESSION["m_uuid"] = $mUuid;
-			$location = "Location: " . $URL . "register.php";
-			header ($location);
+		if (preg_match('/[a-z0-9]{16}/i', $token)) {
+			$m_uuid = get_muuid($token);
+			if($m_uuid != false) {
+				$_SESSION["m_uuid"] = $m_uuid;
+				$location = "Location: " . $URL . "index.php";
+				header ($location);
+			} else {
+				echo "Invalid token";
+				die();
+			}
 		}
 	} else {
 		die();
