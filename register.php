@@ -1,7 +1,10 @@
 <?php
-require __DIR__ . '/constants.php';
-require __DIR__ . '/random.php';
-require __DIR__ . '/connect.php';
+require_once 'constants.php';
+require_once 'random.php';
+require_once 'database.php';
+
+global $handle;
+$handler = new DatabaseHandler($handle);
 
 session_start();
 
@@ -16,7 +19,7 @@ function register_user($m_uuid, $name, $hash, $salt, $email) {
 	}
 }
 
-function is_not_registered($m_uuid, $name, $email) {
+/*function is_not_registered($m_uuid, $name, $email) {
 	if (exists($m_uuid, "m_uuid") || exists($name, "name") || exists($email, "email")) {
 		return false;
 	}
@@ -57,10 +60,10 @@ function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_
 	$prepared_query_token = $handle->prepare($query_token);
 	$prepared_query->execute(array($uid, $email, $email_token));
 }
-
+ */
 function send_verification_email($email, $email_token) {
 }
-
+/*
 function get_user_details($uid) {
 	$query = $handle->prepare("SELECT * FROM users WHERE uid = binary ?");
 	$query->execute($uid);
@@ -70,7 +73,7 @@ function get_user_details($uid) {
 	} 
 	return false;
 }
-
+ */
 function get_salt() {
 	return random($salt_length, "rand");
 }
@@ -78,7 +81,7 @@ function get_salt() {
 function get_hashed($password, $salt) {
 	return password_hash($password . $salt, PASSWORD_BCRYPT);
 }
-
+/*
 function get_muuid($token) {
 	global $handle;
 	try {
@@ -94,7 +97,7 @@ function get_muuid($token) {
 		echo $e->getMessage();
 	}
 }
-
+ */
 function is_valid_name($name) {
 	if(preg_match('~^(?:[\p{L}\p{Mn}\p{Pd}\'\x{2019}]+\s[\p{L}\p{Mn}\p{Pd}\'\x{2019}]+\s?)+$~u', $name)) {
 		return $name;

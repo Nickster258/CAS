@@ -1,10 +1,8 @@
 <?php
-require __DIR__ . '/constants.php';
-require __DIR__ . '/random.php';
-require __DIR__ . '/connect.php';
+require_once 'database.php';
 
 session_start();
-
+/*
 function verify_user($uid) {
 	try {
 		$query = $handle->prepare("UPDATE auth_users SET verified = 1 WHERE uid = ?");
@@ -25,7 +23,7 @@ function verify_token($email_token) {
 	}
 	return false;
 }
-
+ */
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_GET["token"])) {
 		$email_token = $_GET["token"];

@@ -1,6 +1,6 @@
 <?php
-require __DIR__ . '/constants.php';
-require __DIR__ . '/connect.php';
+require_once 'constants.php';
+require_once 'database.php';
 
 try {
 	$query = $handle->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(16), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), salt VARCHAR(16), email VARCHAR(64), verified BOOLEAN, UNIQUE KEY(uid))");
