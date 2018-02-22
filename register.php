@@ -10,6 +10,7 @@ function register_user($m_uuid, $name, $hash, $salt, $email) {
 	$uid = get_unique_id(random(16, "uid"));
 	if (is_not_registered($m_uuid, $name, $email)) {
 		set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+		send_verification_email($email, $email_token);
 	} else {
 		echo "That Mojang UUID, Name, or email has already been registered";
 	}
@@ -24,22 +25,22 @@ function is_not_registered($m_uuid, $name, $email) {
 
 function exists($value, $type) {
 	if (strcmp($type, "m_uuid") === 0) {
-		$query = $handle->prepare("SELECT m_uuid FROM auth_users WHERE m_uuid = binary " . $value);
-		$query->execute();
+		$query = $handle->prepare("SELECT m_uuid FROM auth_users WHERE m_uuid = binary ?");
+		$query->execute($value);
 		$query->fetch(PDO::FETCH_ASSOC);
 		if ($query->rowCount() > 0) {
 			return true;
 		}
 	} else if (strcmp($type, "name") === 0) {
-		$query = $handle->prepare("SELECT name FROM auth_users WHERE name = binary " . $value);
-		$query->execute();
+		$query = $handle->prepare("SELECT name FROM auth_users WHERE name = binary ?");
+		$query->execute($value);
 		$query->fetch(PDO::FETCH_ASSOC);
 		if ($query->rowCount() > 0) {
 			return true;
 		}
 	} else if (strcmp($type, "email") === 0) {
-		$query = $handle->prepare("SELECT email FROM auth_users WHERE email = binary " . $value);
-		$query->execute();
+		$query = $handle->prepare("SELECT email FROM auth_users WHERE email = binary ?");
+		$query->execute($value);
 		$query->fetch(PDO::FETCH_ASSOC);
 		if ($query->rowCount() > 0) {
 			return true;
@@ -49,10 +50,10 @@ function exists($value, $type) {
 }
 
 function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
-	$query = "REPLACE INTO users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
+	$query = "REPLACE INTO auth_users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
         $prepared_query = $handle->prepare($query);
 	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email);
-        $query_token = "REPLACE INTO email_tokens(uid, email, email_token) VALUES (?, ?, ?)";
+        $query_token = "REPLACE INTO auth_emailtokens(uid, email, email_token) VALUES (?, ?, ?)";
 	$prepared_query_token = $handle->prepare($query_token);
 	$prepared_query->execute(array($uid, $email, $email_token));
 }
@@ -61,8 +62,13 @@ function send_verification_email($email, $email_token) {
 }
 
 function get_user_details($uid) {
-	$query = $handle->query("SELECT * FROM users WHERE uid = binary ?");
-	return $query;
+	$query = $handle->prepare("SELECT * FROM users WHERE uid = binary ?");
+	$query->execute($uid);
+	$query->fetch(PDO::FETCH_ASSOC);
+	if ($query->rowCount() > 0) {
+		return $query;
+	} 
+	return false;
 }
 
 function get_salt() {
@@ -74,7 +80,13 @@ function get_hashed($password, $salt) {
 }
 
 function get_muuid($token) {
-
+	$query = $handle->prepare("SELECT m_uuid FROM auth_tokens WHERE token = binary ?");
+	$query->execute($token);
+	$query->fetch(PDO::FETCH_ASSOC);
+	if ($query->rowCount() > 0) {
+		return $query['m_uuid'];
+	}
+	return false;
 }
 
 function is_valid_name($name) {

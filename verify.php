@@ -1,34 +1,35 @@
 <?php
 require __DIR__ . '/constants.php';
 require __DIR__ . '/random.php';
+require __DIR__ . '/connect.php';
 
 session_start();
 
-$conn = mysql_connect($dbhost, $dbuser, $dbpass);
-
-mysql_select_db($db, $conn);
-
-if(!$conn) {
-	die(mysql_error());
-	echo "hi";
-} else {
-	global $conn;
-}
-
 function verify_user($uid) {
-	global $conn;
-	$query = "UPDATE auth_users SET verified = 1 WHERE uid = \"$uid\"";
-	$result = mysql_query($query, $conn);
+	try {
+		$query = $handle->prepare("UPDATE auth_users SET verified = 1 WHERE uid = ?");
+		$query->execute($uid);
+		$query->fetch(PDO::FETCH_ASSOC);
+	} catch (PDOException $e) {
+		return false;
+	}
+	return true;
 }
 
-function is_valid_token($email_token) {
+function verify_token($email_token) {
+	$query = $handle->prepare("SELECT uid FROM auth_emailtokens WHERE email_token = binary ?");
+	$query->execute($email_token));
+	$query->fetch(PDO::FETCH_ASSOC);
+	if ($query->rowCount() > 0) {
+		return $query["uid"];
+	}
+	return false;
 }
 
 if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_GET["token"])) {
 		$email_token = $_GET["token"];
-		$_SESSION["email_token"] = $email_token;
-		if (preg_math('/[a-z]/i', $email_token) && is_valid_token($email_token)) {
+		if (preg_math('/[a-z]/i{' . $email_token_length .'}', $email_token)) {
 			$uid = verify_token($email_token);
 			if($uid != false) {
 				if (verify_user($uid)) {
