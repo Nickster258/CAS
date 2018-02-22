@@ -11,7 +11,7 @@ class DatabaseHandler {
 	/* Checks if the m_uuid, name, or email
 	 * is already within the database
 	 */
-	public function valueExists($value, $type) {
+	public function userValueExists($value, $type) {
 		if (strcmp($type, "m_uuid") === 0) {
 			$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE m_uuid = :m_uuid');
 			$query->bindParam(':m_uuid', $value);
@@ -31,6 +31,22 @@ class DatabaseHandler {
 		} else if (strcmp($type, "email") === 0) {
 			$query = $this->pdo->prepare('SELECT email FROM	auth_users WHERE email = :email');
 			$query->bindParam(':email', $value);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return true;
+			}
+		} else if (strcmp($type, "uid") === 0) {
+			$query = $this->pdo->prepare('SELECT uid FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $value);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return true;
+			}
+		} else if (strcmp($type, "email_token") === 0) {
+			$query = $this->pdo->prepare('SELECT email_token FROM auth_emailtokens WHERE email_token = :email_token');
+			$query->bindParam(':email_token', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
 			if($result) {
@@ -64,9 +80,14 @@ class DatabaseHandler {
 	 * by setting verified to 1
 	 */
 	public function verifyUser($uid) {
-		$query = $this->pdo->prepare('UPDATE auth_users SET verified = 1 WHERE uid = :uid');
-		$query->bindPAram(':uid', $uid);
-		$query->execute();
+		try {
+			$query = $this->pdo->prepare('UPDATE auth_users SET verified = 1 WHERE uid = :uid');
+			$query->bindPAram(':uid', $uid);
+			$query->execute();
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
 	}
 
 	/* Returns the uid affiliated with the
@@ -108,8 +129,8 @@ class DatabaseHandler {
 }
 
 try {
-	$handle = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $dbuser, $dbpass);
-	$handle->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$pdo = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $dbuser, $dbpass);
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
 	echo $e->getMessage();
 	die();

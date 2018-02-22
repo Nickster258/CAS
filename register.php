@@ -3,101 +3,63 @@ require_once 'constants.php';
 require_once 'random.php';
 require_once 'database.php';
 
-global $handle;
-$handler = new DatabaseHandler($handle);
+global $pdo;
+$handler = new DatabaseHandler($pdo);
 
 session_start();
 
-function register_user($m_uuid, $name, $hash, $salt, $email) {
-	$email_token = random(16, "rand");
-	$uid = get_unique_id(random(16, "uid"));
+function register_new_user($m_uuid, $name, $hash, $salt, $email) {
+	$email_token = get_unique_token();
+	$uid = get_unique_id();
 	if (is_not_registered($m_uuid, $name, $email)) {
-		set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
+		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $salt, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
 		echo "That Mojang UUID, Name, or email has already been registered";
 	}
 }
 
-/*function is_not_registered($m_uuid, $name, $email) {
-	if (exists($m_uuid, "m_uuid") || exists($name, "name") || exists($email, "email")) {
+function get_unique_token() {
+	for ($i = 0; $i<<10; $i++) {
+		$temp_token = Random->random(16, "token");
+		if(!$handler->userValueExists($temp_token, "email_token")) {
+			return $temp_token;
+		}
+	}
+	echo "Error with token generation.";
+	die();
+}
+
+function get_unique_id() {
+	for ($i = 0; $i<<10; $i++) {
+		$temp_uid = Random->random(16, "uid");
+		if(!$handler->userValueExists($temp_uid, "uid")) {
+			return $temp_uid;
+		}
+	}
+	echo "Error with unique ID generation.";
+	die();
+}
+
+function is_not_registered($m_uuid, $name, $email) {
+	if($handler->userValueExists($m_uuid, "m_uuid") || $handler->userValueExists($name, "name") || $handler->userValueExists($email, "email")) {
 		return false;
 	}
 	return true;
 }
 
-function exists($value, $type) {
-	if (strcmp($type, "m_uuid") === 0) {
-		$query = $handle->prepare("SELECT m_uuid FROM auth_users WHERE m_uuid = binary ?");
-		$query->execute($value);
-		$query->fetch(PDO::FETCH_ASSOC);
-		if ($query->rowCount() > 0) {
-			return true;
-		}
-	} else if (strcmp($type, "name") === 0) {
-		$query = $handle->prepare("SELECT name FROM auth_users WHERE name = binary ?");
-		$query->execute($value);
-		$query->fetch(PDO::FETCH_ASSOC);
-		if ($query->rowCount() > 0) {
-			return true;
-		}
-	} else if (strcmp($type, "email") === 0) {
-		$query = $handle->prepare("SELECT email FROM auth_users WHERE email = binary ?");
-		$query->execute($value);
-		$query->fetch(PDO::FETCH_ASSOC);
-		if ($query->rowCount() > 0) {
-			return true;
-		}
-	}
-	return false;	
+function send_verification_email($email, $email_token) {
+
 }
 
-function set_unverified_user($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
-	$query = "REPLACE INTO auth_users(uid, m_uuid, username, password, salt, email, verified) VALUES(?, ?, ?, ?, ?, ?, false)";
-        $prepared_query = $handle->prepare($query);
-	$prepared_query->execute(array($uid, $m_uuid, $name, $hash, $salt, $email));
-        $query_token = "REPLACE INTO auth_emailtokens(uid, email, email_token) VALUES (?, ?, ?)";
-	$prepared_query_token = $handle->prepare($query_token);
-	$prepared_query->execute(array($uid, $email, $email_token));
-}
- */
-function send_verification_email($email, $email_token) {
-}
-/*
-function get_user_details($uid) {
-	$query = $handle->prepare("SELECT * FROM users WHERE uid = binary ?");
-	$query->execute($uid);
-	$query->fetch(PDO::FETCH_ASSOC);
-	if ($query->rowCount() > 0) {
-		return $query;
-	} 
-	return false;
-}
- */
 function get_salt() {
-	return random($salt_length, "rand");
+	return Random->random($salt_length, "rand");
 }
 
 function get_hashed($password, $salt) {
 	return password_hash($password . $salt, PASSWORD_BCRYPT);
 }
-/*
-function get_muuid($token) {
-	global $handle;
-	try {
-		$query = $handle->prepare('SELECT m_uuid FROM auth_tokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result['m_uuid'];
-		}
-		return false;
-	} catch (PDOException $e) {
-		echo $e->getMessage();
-	}
-}
- */
+
 function is_valid_name($name) {
 	if(preg_match('~^(?:[\p{L}\p{Mn}\p{Pd}\'\x{2019}]+\s[\p{L}\p{Mn}\p{Pd}\'\x{2019}]+\s?)+$~u', $name)) {
 		return $name;
@@ -113,7 +75,7 @@ function is_valid_email($email) {
 }
 
 function is_valid_pass($pass) {
-	if(preg_match("/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}$/", $pass)) {
+	if(preg_match("/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/", $pass)) {
 		return $pass;
 	}
 	return false;
@@ -133,7 +95,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
 				$_SESSION["pass"] = $valid_pass;
-				register_user($m_uuid, $name, $hash, $email, $salt);
+				register_new_user($m_uuid, $name, $hash, $email, $salt);
 			} else {
 				echo "Your passwords do not match!";
 				die();
@@ -146,7 +108,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$token = $_GET["token"];
 		$_SESSION["token"] = $token;
 		if (preg_match('/[a-z0-9]{16}/i', $token)) {
-			$m_uuid = get_muuid($token);
+			$m_uuid = $handler->fetchMUuid($token);
 			if($m_uuid != false) {
 				$_SESSION["m_uuid"] = $m_uuid;
 				$location = "Location: " . $URL . "index.php";
