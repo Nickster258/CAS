@@ -11,29 +11,31 @@ class DatabaseHandler {
 	/* Checks if the m_uuid, name, or email
 	 * is already within the database
 	 */
-	public function userExists($m_uuid, $name, $email) {
-		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE m_uuid = :m_uuid');
-		$query->bindParam(':m_uuid', $m_uuid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return true;
-		}
-
-		$query = $this->pdo->prepare('SELECT name FROM auth_users WHERE name = :name');
-		$query->bindParam(':name', $name);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return true;
-		}
-
-		$query = $this->pdo->prepare('SELECT email FROM	auth_users WHERE email = :email');
-		$query->bindParam(':email', $email);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return false;
+	public function valueExists($value, $type) {
+		if (strcmp($type, "m_uuid") === 0) {
+			$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE m_uuid = :m_uuid');
+			$query->bindParam(':m_uuid', $value);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return true;
+			}
+		} else if (strcmp($type, "name") === 0 {
+			$query = $this->pdo->prepare('SELECT name FROM auth_users WHERE name = :name');
+			$query->bindParam(':name', $value);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return true;
+			}
+		} else if (strcmp($type, "email") === 0) {
+			$query = $this->pdo->prepare('SELECT email FROM	auth_users WHERE email = :email');
+			$query->bindParam(':email', $value);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return true;
+			}
 		}
 		return false;
 	}
