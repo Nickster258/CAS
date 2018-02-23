@@ -13,8 +13,11 @@ $handler = new DatabaseHandler($pdo);
 session_start();
 
 function register_new_user($m_uuid, $name, $hash, $email) {
+	echo "hah";
 	$email_token = get_unique_token();
 	$uid = get_unique_id();
+	echo $uid;
+	echo $email_token;
 	if (is_not_registered($m_uuid, $name, $email)) {
 		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
@@ -24,26 +27,23 @@ function register_new_user($m_uuid, $name, $hash, $email) {
 }
 
 function get_unique_token() {
-	for ($i = 0; $i<<10; $i++) {
-		$temp_token = Random::newRandom(16, "token");
-		if(!$handler->userValueExists($temp_token, "email_token")) {
-			return $temp_token;
+	for ($i = 0; $i<10; $i++) {
+		$temp = Random::newRandom(16, "token");
+		if(!$handler->userValueExists($temp, "email_token")) {
+			return $temp;
 		}
 	}
-	echo "In email token generation.<br>";
 	echo "Error with token generation.";
-	die();
 }
 
 function get_unique_id() {
-	for ($i = 0; $i<<10; $i++) {
-		$temp_uid = Random::newRandom(16, "uid");
-		if(!$handler->userValueExists($temp_uid, "uid")) {
-			return $temp_uid;
+	for ($i = 0; $i<10; $i++) {
+		$temp = Random::newRandom(16, "uid");
+		if(!$handler->userValueExists($temp, "uid")) {
+			return $temp;
 		}
 	}
 	echo "Error with unique ID generation.";
-	die();
 }
 
 function is_not_registered($m_uuid, $name, $email) {
@@ -54,7 +54,7 @@ function is_not_registered($m_uuid, $name, $email) {
 }
 
 function send_verification_email($email, $email_token) {
-
+	echo "Sending email verification";
 }
 
 function is_valid_name($name) {
