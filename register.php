@@ -1,4 +1,7 @@
 <?php
+
+define('IN_CAS', true);
+
 require_once 'constants.php';
 require_once 'random.php';
 require_once 'database.php';
@@ -111,14 +114,16 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				header ($location);
 			} else {
 				echo "No affiliated Mojand UUID with that token.";
+				session_destroy();
 				die();
 			}
 		} else {
 			echo "Invalid token.";
+			session_destroy();
 			die();
 		}
 	} else {
-		die();
+		header ("Location: " . $URL . "index.php");
 	}
 }	
 ?>

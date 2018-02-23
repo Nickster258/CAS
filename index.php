@@ -92,7 +92,7 @@ p {
 }
 </style>
 <link rel="icon" href="favi.png"/>
-<title>Simple Shortener</title>
+<title>CAS</title>
 </head>
 <body>
 <div class="outer">
@@ -106,15 +106,15 @@ p {
 					<div class=\"input_style\">Mojang UUID</div>
 					<div class=\"uuid_style\">" . $_SESSION["m_uuid"] . "</div> 
 					<form action=\"register.php\" method=\"post\">
-					<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"LordDecrapo\" required><br>
-					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"capois@dumb.com\" required><br>
+					<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"username\" required><br>
+					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"email@example.com\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
 					<div class=\"input_style\">Verify Password</div> <input class=\"input\" type=\"password\" name=\"verified_pass\" required><br>
 					<input class=\"button\" type=\"submit\" value=\"Register\">
 					</form>
 					</p>";
 				} else {
-					echo "<p>Login</br></br>
+					echo "<div class=\"title\"><span class=\"bold\">L</span>ogin</div>
 					<form action=\"login.php\" method=\"post\">
 					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>

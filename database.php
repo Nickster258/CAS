@@ -1,4 +1,10 @@
 <?php
+
+if(!defined('IN_CAS')) {
+	echo "This file cannot be initialized independently.";
+	die();
+}
+
 require_once 'constants.php';
 
 class DatabaseHandler {
@@ -132,6 +138,7 @@ class DatabaseHandler {
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(16), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(16), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_permissions(uid VARCHAR(16), is_student BOOLEAN, is_builder BOOLEAN, is_mod BOOLEAN, is_admin BOOLEAN, is_host BOOLEAN, UNIQUE KEY(uid))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
 			return $e->getMessage();

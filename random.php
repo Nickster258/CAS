@@ -1,4 +1,10 @@
 <?php
+
+if(!defined('IN_CAS')) {
+	echo "This file cannot be initialized independently.";
+	die();
+}
+
 class Random {
 
 	public static function newRandom($length, $type) {
