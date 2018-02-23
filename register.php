@@ -4,6 +4,7 @@ require_once 'random.php';
 require_once 'database.php';
 
 global $pdo;
+
 $handler = new DatabaseHandler($pdo);
 
 session_start();
@@ -21,7 +22,7 @@ function register_new_user($m_uuid, $name, $hash, $email) {
 
 function get_unique_token() {
 	for ($i = 0; $i<<10; $i++) {
-		$temp_token = Random->random(16, "token");
+		$temp_token = Random::newRandom(16, "token");
 		if(!$handler->userValueExists($temp_token, "email_token")) {
 			return $temp_token;
 		}
@@ -32,7 +33,7 @@ function get_unique_token() {
 
 function get_unique_id() {
 	for ($i = 0; $i<<10; $i++) {
-		$temp_uid = Random->random(16, "uid");
+		$temp_uid = Random::newRandom(16, "uid");
 		if(!$handler->userValueExists($temp_uid, "uid")) {
 			return $temp_uid;
 		}
@@ -86,7 +87,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		if (!$valid_name && !$valid_email && !$valid_pass && !$valid_pass_verified) {
 			$hashed_pass = get_hashed($valid_pass);
 			$hashed_pass_verified = get_hashed($valid_pass_verified);
-			if ($hashed_pass != $hashed_pass_verified) {
+			if (strcmp($hashed_pass, $hashed_pass_verified) === 0) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
 				$_SESSION["pass"] = $valid_pass;

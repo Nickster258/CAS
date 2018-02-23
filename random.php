@@ -1,6 +1,7 @@
 <?php
 class Random {
-	public function random($length, $type) {
+
+	public static function newRandom($length, $type) {
 		$chars = '0';
 		if ($type == "uid") {
 			$chars = '0123456789abcdef';
