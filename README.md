@@ -14,4 +14,4 @@ The end-goal in this project is to ease the headaches that administration can ha
 - [X] Implement the setup script
 - [ ] Finalize table structure
 - [ ] Make it work (40% ish)
-- [ ] Prettify the UI
+- [ ] Prettify the UI (Like 60% ish)
