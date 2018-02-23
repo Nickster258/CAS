@@ -30,6 +30,7 @@ function get_unique_token() {
 			return $temp_token;
 		}
 	}
+	echo "In email token generation.<br>";
 	echo "Error with token generation.";
 	die();
 }
@@ -54,10 +55,6 @@ function is_not_registered($m_uuid, $name, $email) {
 
 function send_verification_email($email, $email_token) {
 
-}
-
-function get_hashed($password) {
-	return password_hash($password, PASSWORD_BCRYPT);
 }
 
 function is_valid_name($name) {
@@ -85,15 +82,11 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_SESSION["m_uuid"]) && isset($_POST["name"]) && isset($_POST["email"]) && isset($_POST["pass"]) && isset($_POST["verified_pass"])) {
 		$valid_name = is_valid_name($_POST["name"]);
 		$valid_email = is_valid_email($_POST["email"]);
-		$valid_pass = is_valid_pass($_POST["pass"]);
-		$valid_pass_verified = is_valid_pass($_POST["verified_pass"]);
-		if (!$valid_name && !$valid_email && !$valid_pass && !$valid_pass_verified) {
-			$hashed_pass = get_hashed($valid_pass);
-			$hashed_pass_verified = get_hashed($valid_pass_verified);
-			if (strcmp($hashed_pass, $hashed_pass_verified) === 0) {
+		if (!$valid_name && !$valid_email && (strlen($_POST["pass"]) > 7)) {
+			$hash = password_hash(utf8_decode($_POST["pass"]), PASSWORD_BCRYPT);
+			if (password_verify(utf8_decode($_POST["verified_pass"]), $hash)) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
-				$_SESSION["pass"] = $valid_pass;
 				register_new_user($m_uuid, $name, $hash, $email);
 			} else {
 				echo "Your passwords do not match!";
