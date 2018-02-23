@@ -10,6 +10,7 @@ The end-goal in this project is to ease the headaches that administration can ha
 - [X] Setup PDO and purge all other db handlers
 - [X] Build my own handler on top of PDO ^
 - [X] Setup parameterized mysql statements
+- [ ] Add a proper wildcard login cookies
 - [ ] Implement the mailing function
 - [X] Implement the setup script
 - [ ] Finalize table structure
