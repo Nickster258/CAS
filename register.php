@@ -97,7 +97,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				die();
 			}
 		} else {
-			echo "Oh no, something is formatted! wrong";
+			echo "Oh no, something is formatted wrong!";
 			die();
 		}
 	} else if (isset($_GET["token"])) {
@@ -110,9 +110,12 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$location = "Location: " . $URL . "index.php";
 				header ($location);
 			} else {
-				echo "Invalid token";
+				echo "No affiliated Mojand UUID with that token.";
 				die();
 			}
+		} else {
+			echo "Invalid token.";
+			die();
 		}
 	} else {
 		die();
