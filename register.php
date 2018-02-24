@@ -12,13 +12,17 @@ $handler = new DatabaseHandler($pdo);
 
 session_start();
 
-function register_new_user($m_uuid, $name, $hash, $email) {
-	echo "hah";
-	$email_token = get_unique_token();
-	$uid = get_unique_id();
-	echo $uid;
-	echo $email_token;
-	if (is_not_registered($m_uuid, $name, $email)) {
+function register_new_user($m_uuid, $name, $hash, $email, $handler) {
+	$email_token = get_unique_token($handler);
+	$uid = get_unique_id($handler);
+	//echo is_not_registered($m_uuid, $name, $email, $handler);
+	if (is_not_registered($m_uuid, $name, $email, $handler)) {
+		//echo "<pre>";
+		//echo $m_uuid;
+		//echo $name;
+		//echo $email;
+		//echo $uid;
+		//echo $email_token;
 		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
@@ -26,9 +30,9 @@ function register_new_user($m_uuid, $name, $hash, $email) {
 	}
 }
 
-function get_unique_token() {
+function get_unique_token($handler) {
 	for ($i = 0; $i<10; $i++) {
-		$temp = Random::newRandom(16, "token");
+		$temp = Random::newRandom(16, "uid");
 		if(!$handler->userValueExists($temp, "email_token")) {
 			return $temp;
 		}
@@ -36,7 +40,7 @@ function get_unique_token() {
 	echo "Error with token generation.";
 }
 
-function get_unique_id() {
+function get_unique_id($handler) {
 	for ($i = 0; $i<10; $i++) {
 		$temp = Random::newRandom(16, "uid");
 		if(!$handler->userValueExists($temp, "uid")) {
@@ -46,11 +50,11 @@ function get_unique_id() {
 	echo "Error with unique ID generation.";
 }
 
-function is_not_registered($m_uuid, $name, $email) {
-	if($handler->userValueExists($m_uuid, "m_uuid") || $handler->userValueExists($name, "name") || $handler->userValueExists($email, "email")) {
-		return false;
+function is_not_registered($m_uuid, $name, $email, $handler) {
+	if($handler->userValueExists($m_uuid, "m_uuid") || $handler->userValueExists($email, "email") || $handler->userValueExists($name, "name")) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
 function send_verification_email($email, $email_token) {
@@ -87,7 +91,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 			if (password_verify(utf8_decode($_POST["verified_pass"]), $hash)) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
-				register_new_user($m_uuid, $name, $hash, $email);
+				register_new_user($_SESSION["m_uuid"], $valid_name, $hash, $valid_email, $handler);
 			} else {
 				echo "Your passwords do not match!";
 				die();

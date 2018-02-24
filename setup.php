@@ -1,4 +1,7 @@
 <?php
+
+define("IN_CAS", true);
+
 require_once 'constants.php';
 require_once 'database.php';
 

@@ -19,7 +19,7 @@ class DatabaseHandler {
 	 */
 	public function userValueExists($value, $type) {
 		if (strcmp($type, "m_uuid") === 0) {
-			$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE m_uuid = :m_uuid');
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE m_uuid = :m_uuid');
 			$query->bindParam(':m_uuid', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -27,7 +27,7 @@ class DatabaseHandler {
 				return true;
 			}
 		} else if (strcmp($type, "name") === 0) {
-			$query = $this->pdo->prepare('SELECT name FROM auth_users WHERE name = :name');
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE name = :name');
 			$query->bindParam(':name', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -35,7 +35,7 @@ class DatabaseHandler {
 				return true;
 			}
 		} else if (strcmp($type, "email") === 0) {
-			$query = $this->pdo->prepare('SELECT email FROM	auth_users WHERE email = :email');
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE email = :email');
 			$query->bindParam(':email', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -43,7 +43,7 @@ class DatabaseHandler {
 				return true;
 			}
 		} else if (strcmp($type, "uid") === 0) {
-			$query = $this->pdo->prepare('SELECT uid FROM auth_users WHERE uid = :uid');
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE uid = :uid');
 			$query->bindParam(':uid', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -51,7 +51,7 @@ class DatabaseHandler {
 				return true;
 			}
 		} else if (strcmp($type, "email_token") === 0) {
-			$query = $this->pdo->prepare('SELECT email_token FROM auth_emailtokens WHERE email_token = :email_token');
+			$query = $this->pdo->prepare('SELECT * FROM auth_emailtokens WHERE email_token = :email_token');
 			$query->bindParam(':email_token', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -65,13 +65,12 @@ class DatabaseHandler {
 	/* Sets an unverified user in auth_users
 	 * and in auth_emailtokens
 	 */
-	public function setUnverifiedUser($uid, $m_uuid, $name, $hash, $salt, $email, $email_token) {
-		$query = $this->pdo->prepare('INSERT INTO auth_users(uid, m_uuid, username, password, salt, email, verified) VALUES(:uid, :m_uuid, :username, :password, :salt, :email, 0)');
+	public function setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token) {
+		$query = $this->pdo->prepare('INSERT INTO auth_users(uid, m_uuid, username, password, email, verified) VALUES(:uid, :m_uuid, :username, :password, :email, 0)');
 		$query->bindParam(':uid', $uid);
 		$query->bindParam(':m_uuid', $m_uuid);
 		$query->bindParam(':username', $name);
 		$query->bindParam(':password', $hash);
-		$query->bindParam(':salt', $salt);
 		$query->bindParam(':email', $email);
 		$query->execute();
 
