@@ -21,5 +21,9 @@ class Random {
 		}
 		return $rand;
 	}
+
+	public static function newCryptographicRandom($length) {
+		return bin2hex(random_bytes($length));
+	}
 }
 ?>

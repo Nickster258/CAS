@@ -113,7 +113,7 @@ class DatabaseHandler {
 	 * otherwise, just returns false for no token.
 	 */
 	public function fetchMUuid($token) {
-		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_tokens WHERE token = :token');
+		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_registrationtokens WHERE token = :token');
 		$query->bindParam(':token', $token);
 		$query->execute();
 		$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -126,18 +126,19 @@ class DatabaseHandler {
 	/* Calls to remove the m_uuid affiliated token
 	 * from auth_tokens
 	 */
-	public function removeToken($token) {
-		$query = $this->pdo->prepare('REMOVE FROM auth_tokens WHERE token = :token');
+	public function removeRegistrationToken($token) {
+		$query = $this->pdo->prepare('REMOVE FROM auth_registrationtokens WHERE token = :token');
 		$query->bindParam(':token', $token);
 		$query->execute();
 	}
 
 	public function setup() {
 		try {
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(16), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(16), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_permissions(uid VARCHAR(16), is_student BOOLEAN, is_builder BOOLEAN, is_mod BOOLEAN, is_admin BOOLEAN, is_host BOOLEAN, UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(32), expires INTEGER(12), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(32), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_permissions(uid VARCHAR(32), is_student BOOLEAN, is_builder BOOLEAN, is_mod BOOLEAN, is_admin BOOLEAN, is_host BOOLEAN, UNIQUE KEY(uid))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
 			return $e->getMessage();

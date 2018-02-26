@@ -16,8 +16,6 @@ function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 	$email_token = get_unique_token($handler);
 	$uid = get_unique_id($handler);
 	if (is_not_registered($m_uuid, $name, $email, $handler)) {
-		print_r($email);
-		print_r($name);
 		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
@@ -37,7 +35,7 @@ function get_unique_token($handler) {
 
 function get_unique_id($handler) {
 	for ($i = 0; $i<10; $i++) {
-		$temp = Random::newRandom(16, "uid");
+		$temp = Random::newCryptographicRandom(32);
 		if(!$handler->userValueExists($temp, "uid")) {
 			return $temp;
 		}
