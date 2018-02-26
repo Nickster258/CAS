@@ -27,8 +27,8 @@ class DatabaseHandler {
 				return true;
 			}
 		} else if (strcmp($type, "name") === 0) {
-			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE name = :name');
-			$query->bindParam(':name', $value);
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE username = :username');
+			$query->bindParam(':username', $value);
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
 			if($result) {

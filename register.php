@@ -15,14 +15,7 @@ session_start();
 function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 	$email_token = get_unique_token($handler);
 	$uid = get_unique_id($handler);
-	//echo is_not_registered($m_uuid, $name, $email, $handler);
 	if (is_not_registered($m_uuid, $name, $email, $handler)) {
-		//echo "<pre>";
-		//echo $m_uuid;
-		//echo $name;
-		//echo $email;
-		//echo $uid;
-		//echo $email_token;
 		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
@@ -52,9 +45,9 @@ function get_unique_id($handler) {
 
 function is_not_registered($m_uuid, $name, $email, $handler) {
 	if($handler->userValueExists($m_uuid, "m_uuid") || $handler->userValueExists($email, "email") || $handler->userValueExists($name, "name")) {
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 function send_verification_email($email, $email_token) {
