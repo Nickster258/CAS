@@ -63,6 +63,7 @@ a:hover {
 	border: 1px solid #a71700;
 	border-radius: 2px;
 	width:320px;
+	margin-bottom:20px;
 }
 .linkFormat {
 	text-decoration: none;
@@ -76,7 +77,6 @@ p {
 	width: 320px;
 	font-size: 12px;
 	text-align: left;
-	padding-top: 10px;
 	padding-left: 20px;
 }
 .uuid_style {
@@ -118,6 +118,7 @@ p {
 					<form action=\"login.php\" method=\"post\">
 					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
+					<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>
 					<input class=\"button\" type=\"submit\" value=\"Login\">
 					</form>
 					</p>";

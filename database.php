@@ -81,6 +81,21 @@ class DatabaseHandler {
 		$query->execute();
 	}
 
+	/* Sets an authentication token relative
+	 * to the ID that requested it
+	 */
+	public function setAuthToken($uid, $token, $timeout) {
+		try {
+			$query = $this->pdo->prepare('INSERT INTO auth_tokens(uid, token, expires) VALUES (:uid, :token, :expires)');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':token', $token);
+			$query->bindParam(':expires', $timeout);
+			$query->execute();
+		} catch (Exception $e) {
+			print_r($e->getMessage());
+		}
+	}
+
 	/* Verifies the user by uid in auth_users
 	 * by setting verified to 1
 	 */
@@ -96,15 +111,57 @@ class DatabaseHandler {
 	}
 
 	/* Returns the uid affiliated with the
-	 * specific token
+	 * specific email token
 	 */
-	public function fetchUidFromToken($email_token) {
+	public function fetchUidFromEmailToken($email_token) {
 		$query = $this->pdo->prepare('SELECT uid FROM auth_emailtokens WHERE email_token = :email_token');
 		$query->bindParam(':email_token', $email_token);
 		$query->execute();
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if($result) {
 			return $result['uid'];
+		}
+		return false;
+	}
+
+	/* Returns the uid affiliated with the
+	 * specified token
+	 */
+	public function fetchUidFromToken($token) {
+		$query = $this->pdo->prepare('SELECT uid FROM auth_tokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			return $result['uid'];
+		}
+		return false;
+	}
+
+	/* Returns the uid affiliated with the
+	 * email of the user
+	 */
+	public function fetchUidFromEmail($email) {
+		$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE email = :email');
+		$query->bindParam(':email', $email);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['uid'];
+		}
+		return false;
+	}
+
+	/* returns the hash affiliated with the uid
+	 * of the user
+	 */
+	public function fetchHashFromUid($uid) {
+		$query = $this->pdo->prepare('SELECT password FROM auth_users WHERE uid = :uid');
+		$query->bindParam(':uid', $uid);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['password'];
 		}
 		return false;
 	}
@@ -134,7 +191,7 @@ class DatabaseHandler {
 
 	public function setup() {
 		try {
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(32), expires INTEGER(12), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), expires INTEGER(12), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(32), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
