@@ -24,6 +24,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$uid = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
 		if($uid) {
 			echo "You are already logged in";
+			$_SESSION["uid"] = $uid;
 		} else {
 			echo "Invalid cookie";
 			die();
@@ -39,7 +40,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 					$remember_me_time = time() + 5184000; // 5184000 = 60 days
 					$remember_me_token = Random::newCryptographicRandom(32);
 					$handler->setAuthToken($uid, $remember_me_token, $remember_me_time);
-					setcookie("cas_auth", $remember_me_token, $remember_me_time, "", $MYDOMAIN);
+					setcookie("cas_auth", $remember_me_token, $remember_me_time, "/", $MYDOMAIN);
 					echo "You are now logged in";
 				}
 			} else {

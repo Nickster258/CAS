@@ -31,7 +31,7 @@ a {
 }
 a:hover {
 	text-decoration: none;
-	color: #4CAF50;
+	color: #821200;
 }
 .button {
 	background-color: #a71700;
@@ -90,6 +90,26 @@ p {
 .title {
 	margin-bottom: 10px;
 }
+.subtitle {
+	margin-bottom: 10px;
+	font-size: 16;
+}
+.welcomeback {
+	font-size: 12;
+	margin-bottom: 20px;
+}
+.logout {
+	font-size: 11;
+	margin-bottom: 20px;
+}
+.name {
+	color: #a71700;
+}
+#footer {
+	padding-top: 10px;
+	border-top: 1px solid black;
+	font-size: 10px;
+}
 </style>
 <link rel="icon" href="favi.png"/>
 <title>CAS</title>
@@ -98,11 +118,32 @@ p {
 <div class="outer">
 	<div class="middle">
 		<div class="inner">
+			<div class="title"><span class="bold">C</span>AS</div>
 			<?php
+				define('IN_CAS', true);
+
+				require_once 'constants.php';
+				require_once 'database.php';
+
+				global $pdo;
+
+				$handler = new DatabaseHandler($pdo);
+
 				session_start();
-				if(isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
+
+				function print_footer() {
+					echo "<div id=\"footer\"><a href=\"" . $URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
+				}
+
+				if(isset($_COOKIE['cas_auth'])) {
+					$uid = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
+					$username = $handler->fetchNameFromUid($uid);
+					echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
+					<div class=\"logout\"><a href=\"" . $URL . "logout.php\">Logout</a></div>";
+					print_footer();
+				} else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 	
-					echo "<div class=\"title\"><span class=\"bold\">R</span>egister</div>
+					echo "<div class=\"subtitle\"><span class=\"bold\">R</span>egister</div>
 					<div class=\"input_style\">Mojang UUID</div>
 					<div class=\"uuid_style\">" . $_SESSION["m_uuid"] . "</div> 
 					<form action=\"register.php\" method=\"post\">
@@ -113,8 +154,9 @@ p {
 					<input class=\"button\" type=\"submit\" value=\"Register\">
 					</form>
 					</p>";
+					print_footer();
 				} else {
-					echo "<div class=\"title\"><span class=\"bold\">L</span>ogin</div>
+					echo "<div class=\"subtitle\"><span class=\"bold\">L</span>ogin</div>
 					<form action=\"login.php\" method=\"post\">
 					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
@@ -122,6 +164,7 @@ p {
 					<input class=\"button\" type=\"submit\" value=\"Login\">
 					</form>
 					</p>";
+					print_footer();
 				}
 			?>
 		</div>

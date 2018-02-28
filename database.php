@@ -124,6 +124,20 @@ class DatabaseHandler {
 		return false;
 	}
 
+	/* Returns the name affiliated with the
+	 * uid
+	 */
+	public function fetchNameFromUid($uid) {
+		$query = $this->pdo->prepare('SELECT username FROM auth_users WHERE uid = :uid');
+		$query->bindParam(':uid', $uid);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			return $result['username'];
+		}
+		return false;
+	}
+
 	/* Returns the uid affiliated with the
 	 * specified token
 	 */
@@ -180,18 +194,27 @@ class DatabaseHandler {
 		return false;
 	}
 
+	/* Calls to remove the token from the database 
+	 * affiliated with the token data
+	 */
+	public function removeAuthToken($token) {
+		$query = $this->pdo->prepare('DELETE FROM auth_tokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+	}
+
 	/* Calls to remove the m_uuid affiliated token
 	 * from auth_tokens
 	 */
 	public function removeRegistrationToken($token) {
-		$query = $this->pdo->prepare('REMOVE FROM auth_registrationtokens WHERE token = :token');
+		$query = $this->pdo->prepare('DELETE FROM auth_registrationtokens WHERE token = :token');
 		$query->bindParam(':token', $token);
 		$query->execute();
 	}
 
 	public function setup() {
 		try {
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), expires INTEGER(12), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), expires INTEGER(12))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(32), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
