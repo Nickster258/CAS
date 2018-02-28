@@ -141,6 +141,11 @@ p {
 					echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
 					<div class=\"logout\"><a href=\"" . $URL . "logout.php\">Logout</a></div>";
 					print_footer();
+				} else if (isset($_SESSION["uid"])) {
+					$username = $handler->fetchNameFromUid($_SESSION["uid"]);
+					echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
+					<div class=\"logout\"><a href=\"" . $URL . "logout.php\">Logout</a></div>";
+					print_footer();
 				} else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 	
 					echo "<div class=\"subtitle\"><span class=\"bold\">R</span>egister</div>
