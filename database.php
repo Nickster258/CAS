@@ -74,10 +74,11 @@ class DatabaseHandler {
 		$query->bindParam(':email', $email);
 		$query->execute();
 
-		$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token) VALUES (:uid, :email, :email_token)');
+		$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, expires) VALUES (:uid, :email, :email_token, :expires)');
 		$query->bindParam(':uid', $uid);
 		$query->bindParam(':email', $email);
 		$query->bindParam(':email_token', $email_token);
+		$query->bindParam(':expires', time()+86400);
 		$query->execute();
 	}
 
@@ -216,7 +217,7 @@ class DatabaseHandler {
 		try {
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), expires INTEGER(12))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(32), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, UNIQUE KEY(uid))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), expires INTEGER(12), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_permissions(uid VARCHAR(32), is_student BOOLEAN, is_builder BOOLEAN, is_mod BOOLEAN, is_admin BOOLEAN, is_host BOOLEAN, UNIQUE KEY(uid))");
 			return "Successfully setup the database.";

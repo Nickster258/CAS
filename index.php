@@ -155,8 +155,19 @@ p {
 					<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"username\" required><br>
 					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"email@example.com\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
-					<div class=\"input_style\">Verify Password</div> <input class=\"input\" type=\"password\" name=\"verified_pass\" required><br>
-					<input class=\"button\" type=\"submit\" value=\"Register\">
+					<div class=\"input_style\">Verify Password</div> <input class=\"input\" type=\"password\" name=\"verified_pass\" required><br>";
+					
+					if (isset($_SESSION["response"]) && (strcmp($_SESSION["response"]["location"], "registration_form") === 0 )) {
+						$status = $_SESSION["response"]["status"];
+						$message = $_SESSION["response"]["message"];
+						
+						echo "<div class=\"" . $status . "\">" . $message . "</div>";
+
+						unset($_SESSION["response"]);
+
+					}						
+
+					echo "<input class=\"button\" type=\"submit\" value=\"Register\">
 					</form>
 					</p>";
 					print_footer();
@@ -165,8 +176,19 @@ p {
 					<form action=\"login.php\" method=\"post\">
 					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
 					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
-					<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>
-					<input class=\"button\" type=\"submit\" value=\"Login\">
+					<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>";
+
+					if (isset($_SESSION["response"]) && (strcmp($_SESSION["response"]["location"], "login_form") === 0 )) {
+						
+						$status = $_SESSION["response"]["status"];
+						$message = $_SESSION["response"]["message"];
+
+						echo "<div class=\"" . $status . "\">" . $message . "</div>";
+
+						unset($_SESSION["response"]);
+					}
+	
+					echo "<input class=\"button\" type=\"submit\" value=\"Login\">
 					</form>
 					</p>";
 					print_footer();
