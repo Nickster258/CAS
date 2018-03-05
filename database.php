@@ -96,6 +96,19 @@ class DatabaseHandler {
 			print_r($e->getMessage());
 		}
 	}
+	/* Sets the password for a selected
+	 * uid
+	 */
+	public function setNewPass($uid, $hash) {
+		try {
+			$query = $this->pdo->prepare('UPDATE auth_users SET password = :hash WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':hash', $hash);
+			$query->execute();
+		} catch (Exception $e) {
+			print_r($e->getMessage());
+		}
+	}
 
 	/* Verifies the user by uid in auth_users
 	 * by setting verified to 1
@@ -139,6 +152,20 @@ class DatabaseHandler {
 		return false;
 	}
 
+	/* Returns the email affiliated with the
+	 * uid
+	 */
+	public function fetchEmailFromUid($uid) {
+		$query = $this->pdo->prepare('SELECT email FROM auth_users WHERE uid = :uid');
+		$query->bindParam(':uid', $uid);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			return $result['email'];
+		}
+		return false;
+	}
+
 	/* Returns the uid affiliated with the
 	 * specified token
 	 */
@@ -177,6 +204,20 @@ class DatabaseHandler {
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if ($result) {
 			return $result['password'];
+		}
+		return false;
+	}
+
+	/* Returns the mojang uuid affiliated with
+	 * the uid of the user
+	 */
+	public function fetchMUuidFromUid($uid) {
+		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE uid = :uid');
+		$query->bindParam(':uid', $uid);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			return $result['m_uuid'];
 		}
 		return false;
 	}

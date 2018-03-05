@@ -4,6 +4,7 @@ define('IN_CAS', true);
 
 require_once ('constants.php');
 require_once ('database.php');
+require_once ('response.php');
 
 global $pdo;
 
@@ -17,8 +18,9 @@ if (isset($_COOKIE['cas_auth'])) {
 	setcookie('cas_auth', null, -1, "/", $MYDOMAIN);
 }
 
-session_destroy();
+unset($_SESSION["uid"]);
 
-header ("Location: " . $URL . "index.php");
+$response = new UserResponse("successfulLogout");
+$response->redirect();
 
 ?>

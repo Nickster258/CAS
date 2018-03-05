@@ -27,7 +27,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$email_token = get_unique_token($handler);
 				$uid = get_unique_id($handler);
 				$m_uuid = $_SESSION["m_uuid"];
-				if (is_not_registered($m_uuid, $valid_name, $valid_email, $handler)) {
+				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
 					send_verification_email($email, $email_token);
 					$response = new RegistrationResponse("registrationSuccess");
@@ -55,7 +55,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 					$location = "Location: " . $URL . "index.php";
 					header ($location);
 				} else {
-					$response = new RegistrationResponse("alreadyRegisterd");
+					$response = new RegistrationResponse("muuidRegistered");
 					$response->redirect();
 				}	
 			} else {

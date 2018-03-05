@@ -5,6 +5,25 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
+function verify_login() {
+	if (isset($_COOKIE['cas_auth'])) {
+		if (!isset($_SESSION["uid"])) {
+			$_SESSION["uid"] = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
+		}
+	}
+}
+
+function do_response($location) {
+	if (isset($_SESSION["response"]) && (strcmp($_SESSION["response"]["location"], $location) === 0)) {
+		$status = $_SESSION["response"]["status"];
+		$message = $_SESSION["response"]["message"];
+
+		echo "<div class=\"" . $status . "\">" . $message . "</div>";
+
+		unset($_SESSION["response"]);
+	}
+}
+
 function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 	$email_token = get_unique_token($handler);
 	$uid = get_unique_id($handler);
@@ -40,7 +59,7 @@ function get_unique_id($handler) {
 }
 
 function is_not_registered($m_uuid, $name, $email, $handler) {
-	if($handler->userValueExists($m_uuid, "m_uuid") || $handler->userValueExists($email, "email") || $handler->userValueExists($name, "name")) {
+	if($handler->userValueExists($email, "email") || $handler->userValueExists($name, "name")) {
 		return false;
 	}
 	return true;

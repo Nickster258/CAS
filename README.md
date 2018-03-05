@@ -14,5 +14,5 @@ The end-goal in this project is to ease the headaches that administration can ha
 - [ ] Implement the mailing function
 - [X] Implement the setup script
 - [X] Finalize table structure
-- [ ] Make it work (90% ish)
-- [ ] Prettify the UI (Like 60% ish | need to add proper in-page responses other than echo)
+- [ ] Make it work (95% ish)
+- [ ] Prettify the UI (Like 90% ish | In page responses are simplistic, but functional)
