@@ -129,6 +129,11 @@ p {
 <title>CAS</title>
 </head>
 <body>
+<div class="outer">
+<div class="middle">
+<div class="inner">
+<div class="title"><span class="bold">C</span>AS</div>
+
 <?php
 
 define ('IN_CAS', true);
@@ -147,50 +152,51 @@ verify_login($handler);
 
 do_response("generic");
 
-echo "<div class=\"outer\"><div class=\"middle\"><div class=\"inner\"><div class=\"title\"><span class=\"bold\">C</span>AS</div>";
-				function print_footer() {
-					echo "<div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
-				}
+if (isset($_SESSION["uid"])) {
 
-				if (isset($_SESSION["uid"])) {
-					$username = $handler->fetchNameFromUid($_SESSION["uid"]);
-					echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
-					<div class=\"logout\"><a href=\"" . URL . "logout.php\">Logout</a> | <a href=\"" . URL . "user.php\">Settings</a></div>";
-					print_footer();
-				} else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
-	
-					echo "<div class=\"subtitle\"><span class=\"bold\">R</span>egister</div>
-					<div class=\"input_style\">Mojang UUID</div>
-					<div class=\"uuid_style\">" . $_SESSION["m_uuid"] . "</div> 
-					<form action=\"register.php\" method=\"post\">
-					<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"username\" required><br>
-					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"email@example.com\" required><br>
-					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
-					<div class=\"input_style\">Verify Password</div> <input class=\"input\" type=\"password\" name=\"verified_pass\" required><br>";
+	$username = $handler->fetchNameFromUid($_SESSION["uid"]);
+	echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
+	<div class=\"logout\"><a href=\"" . URL . "logout.php\">Logout</a> | <a href=\"" . URL . "user.php\">Settings</a></div>";
 
-					do_response("registration_form");
+} else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 
-					echo "<input class=\"button\" type=\"submit\" value=\"Register\">
-					</form>
-					</p>";
-					print_footer();
-				} else {
-					echo "<div class=\"subtitle\"><span class=\"bold\">L</span>ogin</div>
-					<form action=\"login.php\" method=\"post\">
-					<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
-					<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
-					<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>";
+	echo "<div class=\"subtitle\"><span class=\"bold\">R</span>egister</div>
+	<div class=\"input_style\">Mojang UUID</div>
+	<div class=\"uuid_style\">" . $_SESSION["m_uuid"] . "</div> 
+	<form action=\"register.php\" method=\"post\">
+	<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"username\" required><br>
+	<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"email@example.com\" required><br>
+	<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
+	<div class=\"input_style\">Verify Password</div> <input class=\"input\" type=\"password\" name=\"verified_pass\" required><br>";
 
-					do_response("login_form");
-	
-					echo "<input class=\"button\" type=\"submit\" value=\"Login\">
-					</form>
-					</p>";
-					print_footer();
-				}
-			?>
-		</div>
-	</div>
+	do_response("registration_form");
+
+	echo "<input class=\"button\" type=\"submit\" value=\"Register\">
+	</form>
+	</p>";
+
+} else {
+
+	echo "<div class=\"subtitle\"><span class=\"bold\">L</span>ogin</div>
+	<form action=\"login.php\" method=\"post\">
+	<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
+	<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
+	<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>";
+
+	do_response("login_form");
+
+	echo "<input class=\"button\" type=\"submit\" value=\"Login\">
+	</form>
+	</p>";
+
+}
+
+echo "<div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help </div>";
+
+?>
+
+</div>
+</div>
 </div>
 </body>
 </html>
