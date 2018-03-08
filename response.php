@@ -43,7 +43,7 @@ class Response {
 class UserResponse extends Response {
 
 	public function __construct($type) {
-		$this->target = $URL . "index.php";
+		$this->target = URL . "index.php";
 		$this->type = $type;
 		switch($type) {
 			case "invalidFormatting":
@@ -120,35 +120,35 @@ class UserResponse extends Response {
 		$this->message = "Your settings have been updated";
 		$this->status = "success";
 		$this->location = "generic";
-		$this->target = $URL . "user.php";
+		$this->target = URL . "user.php";
 	}
 
 	public function passwordMismatch() {
 		$this->message = "Your passwords do not match";
 		$this->status = "failure";
 		$this->location = "settings_form";
-		$this->target = $URL . "user.php";
+		$this->target = URL . "user.php";
 	}
 
 	public function incorrectPassword() {
 		$this->message = "You have entered an incorrect password";
 		$this->status = "failure";
 		$this->location = "settings_form";
-		$this->target = $URL . "user.php";
+		$this->target = URL . "user.php";
 	}
 
 	public function notAuthorized() {
 		$this->message = "You are not authorized to view this";
 		$this->status = "failure";
 		$this->location = "generic";
-		$this->target = $URL . "index.php";
+		$this->target = URL . "index.php";
 	}
 }
 
 class RegistrationResponse extends Response {
 
 	public function __construct($type) {
-		$this->target = $URL . "index.php";
+		$this->target = URL . "index.php";
 		$this->type = $type;
 		switch($type) {
 			case "invalidToken":

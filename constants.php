@@ -3,11 +3,13 @@ if (!defined('IN_CAS')) {
 	echo "This file cannot be initialized independently.";
 	die();
 }
-$dbhost = 'localhost';
-$dbuser = 'dbuser';
-$dbpass = 'dbpass';
-$dbname = 'databasename';
-$email_token_length = 16;
-$URL = 'https://sub.example.com/';
-$MYDOMAN = 'example.com';
+
+define('DBHOST', "localhost");
+define('DBUSER', "dbuser");
+define('DBPASS', "dbpass");
+define('DBNAME', "databasename");
+
+define('EMAIL_TOKEN_LENGTH', 16);
+define('URL', "https://sub.example.com/");
+define('DOMAIN', "example.com");
 ?>

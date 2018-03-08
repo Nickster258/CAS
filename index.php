@@ -143,19 +143,19 @@ $handler = new DatabaseHandler($pdo);
 
 session_start();
 
-verify_login();
+verify_login($handler);
 
 do_response("generic");
 
 echo "<div class=\"outer\"><div class=\"middle\"><div class=\"inner\"><div class=\"title\"><span class=\"bold\">C</span>AS</div>";
 				function print_footer() {
-					echo "<div id=\"footer\"><a href=\"" . $URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
+					echo "<div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
 				}
 
 				if (isset($_SESSION["uid"])) {
 					$username = $handler->fetchNameFromUid($_SESSION["uid"]);
 					echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
-					<div class=\"logout\"><a href=\"" . $URL . "logout.php\">Logout</a> | <a href=\"" . $URL . "user.php\">Settings</a></div>";
+					<div class=\"logout\"><a href=\"" . URL . "logout.php\">Logout</a> | <a href=\"" . URL . "user.php\">Settings</a></div>";
 					print_footer();
 				} else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 	

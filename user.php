@@ -154,11 +154,15 @@ do_response("generic");
 
 echo "<div class=\"outer\"><div class=\"middle\"><div class=\"inner\"><div class=\"title\"><span class=\"bold\">C</span>AS</div>";
 				function print_footer() {
-					echo "<hr><div id=\"footer\"><a href=\"" . $URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
+					echo "<hr><div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact help</div>";
 				}
 
 				if (isset($_SESSION["uid"])) {
-	
+
+					if (!isset($_SESSION["m_uuid"])) {
+						$_SESSION["m_uuid"] = $handler->fetchMUuidFromUid($_SESSION["uid"]);
+					}
+
 					echo "<div class=\"subtitle\"><span class=\"bold\">U</span>ser</div>
 					<div class=\"input_style\">Mojang UUID</div>
 					<div class=\"user_content\">" . $_SESSION["m_uuid"] . "</div> 

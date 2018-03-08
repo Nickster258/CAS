@@ -266,10 +266,22 @@ class DatabaseHandler {
 			return $e->getMessage();
 		}
 	}
+
+	public function echoStatus() {
+		$attributes = array(
+			"AUTOCOMMIT", "ERRMODE", "CASE", "CLIENT_VERSION", "CONNECTION_STATUS",
+			"ORACLE_NULLS", "PERSISTENT" 
+		);
+
+		foreach ($attributes as $val) {
+			echo "PDO::ATTR_$val: ";
+			echo $this->pdo->getAttribute(constant("PDO::ATTR_$val")) . "<br>\r\n";
+		}
+	}
 }
 
 try {
-	$pdo = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $dbuser, $dbpass);
+	$pdo = new PDO('mysql:host=' . DBHOST . ';dbname=' . DBNAME, DBUSER, DBPASS);
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
 	echo $e->getMessage();

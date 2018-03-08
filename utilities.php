@@ -5,10 +5,15 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
-function verify_login() {
+require_once 'database.php';
+
+function verify_login($handler) {
 	if (isset($_COOKIE['cas_auth'])) {
 		if (!isset($_SESSION["uid"])) {
 			$_SESSION["uid"] = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
+		}
+		if (!isset($_SESSION["m_uuid"])) {
+			$_SESSION["m_uuid"] = $handler->fetchMUuidFromUid($_SESSION["uid"]);
 		}
 	}
 }
@@ -40,7 +45,7 @@ function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 
 function get_unique_token($handler) {
 	for ($i = 0; $i<10; $i++) {
-		$temp = Random::newRandom(16, "uid");
+		$temp = Random::newRandom(EMAIL_TOKEN_LENGTH, "uid");
 		if(!$handler->userValueExists($temp, "email_token")) {
 			return $temp;
 		}

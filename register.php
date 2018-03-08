@@ -52,7 +52,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 			if($m_uuid != false) {
 				if(!$handler->userValueExists($m_uuid, "m_uuid")) {
 					$_SESSION["m_uuid"] = $m_uuid;
-					$location = "Location: " . $URL . "index.php";
+					$location = "Location: " . URL . "index.php";
 					header ($location);
 				} else {
 					$response = new RegistrationResponse("muuidRegistered");
