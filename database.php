@@ -78,7 +78,8 @@ class DatabaseHandler {
 		$query->bindParam(':uid', $uid);
 		$query->bindParam(':email', $email);
 		$query->bindParam(':email_token', $email_token);
-		$query->bindParam(':expires', time()+86400);
+		$expires = time()+86400;
+		$query->bindParam(':expires', $expires);
 		$query->execute();
 	}
 

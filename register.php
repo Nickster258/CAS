@@ -29,7 +29,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$m_uuid = $_SESSION["m_uuid"];
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
-					send_verification_email($email, $email_token);
+					//send_verification_email($email, $email_token);
 					$response = new RegistrationResponse("registrationSuccess");
 					$response->redirect();
 				} else {

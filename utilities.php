@@ -15,6 +15,9 @@ function verify_login($handler) {
 		if (!isset($_SESSION["m_uuid"])) {
 			$_SESSION["m_uuid"] = $handler->fetchMUuidFromUid($_SESSION["uid"]);
 		}
+		if (!isset($_SESSION["email"])) {
+			$_SESSION["email"] = $handler->fetchEmailFromUid($_SESSION["uid"]);
+		}
 	}
 }
 
@@ -63,7 +66,7 @@ function get_unique_id($handler) {
 	echo "Error with unique ID generation.";
 }
 
-function is_not_registered($m_uuid, $name, $email, $handler) {
+function is_not_registered($name, $email, $handler) {
 	if($handler->userValueExists($email, "email") || $handler->userValueExists($name, "name")) {
 		return false;
 	}

@@ -128,10 +128,6 @@ p {
 <title>CAS</title>
 </head>
 <body>
-<div class="outer">
-<div class="middle">
-<div class="inner">
-<div class="title"><span class="bold">C</span>AS</div>
 
 <?php
 
@@ -156,6 +152,15 @@ if(!isset($_SESSION["uid"])) {
 }
 
 do_response("generic");
+
+?>
+
+<div class="outer">
+<div class="middle">
+<div class="inner">
+<div class="title"><span class="bold">C</span>AS</div>
+
+<?php
 
 if (isset($_SESSION["uid"])) {
 

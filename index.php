@@ -107,7 +107,6 @@ p {
 }
 #footer {
 	padding-top: 10px;
-	border-top: 1px solid black;
 	font-size: 10px;
 }
 .failure {
@@ -129,10 +128,6 @@ p {
 <title>CAS</title>
 </head>
 <body>
-<div class="outer">
-<div class="middle">
-<div class="inner">
-<div class="title"><span class="bold">C</span>AS</div>
 
 <?php
 
@@ -152,6 +147,15 @@ verify_login($handler);
 
 do_response("generic");
 
+?>
+
+<div class="outer">
+<div class="middle">
+<div class="inner">
+<div class="title"><span class="bold">C</span>AS</div>
+
+<?php
+
 if (isset($_SESSION["uid"])) {
 
 	$username = $handler->fetchNameFromUid($_SESSION["uid"]);
@@ -162,7 +166,7 @@ if (isset($_SESSION["uid"])) {
 
 	echo "<div class=\"subtitle\"><span class=\"bold\">R</span>egister</div>
 	<div class=\"input_style\">Mojang UUID</div>
-	<div class=\"uuid_style\">" . $_SESSION["m_uuid"] . "</div> 
+	<div class=\"user_content\">" . $_SESSION["m_uuid"] . "</div> 
 	<form action=\"register.php\" method=\"post\">
 	<div class=\"input_style\">Name</div> <input class=\"input\" type=\"text\" name=\"name\" placeholder=\"username\" required><br>
 	<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" placeholder=\"email@example.com\" required><br>
@@ -191,7 +195,7 @@ if (isset($_SESSION["uid"])) {
 
 }
 
-echo "<div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help </div>";
+echo "<hr><div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help </div>";
 
 ?>
 

@@ -223,9 +223,9 @@ class RegistrationResponse extends Response {
 	}
 
 	public function registrationSuccess() {
-		$this->message = "You have successfully registered";
+		$this->message = "You have successfully registered. Please log in to continue.";
 		$this->status = "success";
-		$this->location = "registration_form";
+		$this->location = "generic";
 	}
 }
 
