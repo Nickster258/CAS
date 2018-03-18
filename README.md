@@ -15,4 +15,5 @@ The end-goal in this project is to ease the headaches that administration can ha
 - [X] Implement the setup script
 - [X] Finalize table structure
 - [ ] Make it work (95% ish)
-- [ ] Prettify the UI (Like 90% ish | In page responses are simplistic, but functional)
+- [ ] Prettify the UI (95% ish)
+- [ ] Setup the API
