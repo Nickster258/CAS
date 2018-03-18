@@ -133,10 +133,10 @@ p {
 
 define ('IN_CAS', true);
 
-require_once 'constants.php';
-require_once 'database.php';
-require_once 'response.php';
-require_once 'utilities.php';
+require_once 'includes/constants.php';
+require_once 'includes/database.php';
+require_once 'includes/response.php';
+require_once 'includes/utilities.php';
 
 global $pdo;
 
