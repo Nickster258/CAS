@@ -62,6 +62,30 @@ class DatabaseHandler {
 		return false;
 	}
 
+	/* Checks if the access_token for the
+	 * api exists
+	 */
+	public function accessTokenExists($token) {
+		$query = $this->pdo->prepare('SELECT * from auth_api_tokens WHERE access_token = :access_token');
+		$query->bindParam(':access_token', $token);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return true;
+		}
+		return false;
+	}
+
+	/* Sets an access_token in api_tokens
+	 */
+	public function setAccessToken($access_token, $client_token, $uid) {
+		$query = $this->pdo->prepare('INSERT INTO auth_api_tokens(access_token, client_token, uid) VALUES(:access_token, :client_token, :uid)');
+		$query->bindParam(':access_token', $access_token);
+		$query->bindParam(':client_token', $client_token);
+		$query->bindParam(':uid', $uid);
+		$query->execute();
+	}
+
 	/* Sets an unverified user in auth_users
 	 * and in auth_emailtokens
 	 */
@@ -262,6 +286,7 @@ class DatabaseHandler {
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), expires INTEGER(12), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(m_uuid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_permissions(uid VARCHAR(32), is_student BOOLEAN, is_builder BOOLEAN, is_mod BOOLEAN, is_admin BOOLEAN, is_host BOOLEAN, UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_api_tokens(access_token VARCHAR(32), client_token VARCHAR(128), uid VARCHAR(32), UNIQUE KEY(access_token))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
 			return $e->getMessage();

@@ -147,8 +147,7 @@ session_start();
 verify_login();
 
 if(!isset($_SESSION["uid"])) {
-	$response = new UserResponse("notAuthorized");
-	$response->redirect();
+	new UserResponse("notAuthorized");
 }
 
 do_response("generic");

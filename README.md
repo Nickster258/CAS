@@ -16,4 +16,4 @@ The end-goal in this project is to ease the headaches that administration can ha
 - [X] Finalize table structure
 - [ ] Make it work (95% ish)
 - [ ] Prettify the UI (95% ish)
-- [ ] Setup the API
+- [ ] Setup the API (25% ish)

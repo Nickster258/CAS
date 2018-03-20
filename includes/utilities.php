@@ -6,6 +6,16 @@ if(!defined('IN_CAS')) {
 }
 
 require_once 'database.php';
+require_once 'random.php';
+
+function valid_json($raw) {
+	$decoded = json_decode($raw);
+	//if(!is_array($decoded)) {
+	//	return false;
+	//}
+	//return true;
+	return (json_last_error() == JSON_ERROR_NAME);
+}
 
 function verify_login($handler) {
 	if (isset($_COOKIE['cas_auth'])) {
@@ -39,11 +49,20 @@ function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 		$handler->setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token);
 		send_verification_email($email, $email_token);
 	} else {
-		$response = new RegistrationResponse("alreadyRegistered");
-		$response->redirect();
+		new RegistrationResponse("alreadyRegistered");
 		echo "That Mojang UUID, Name, or email has already been registered";
 		session_destroy();
 	}
+}
+
+function get_unique_access_token($handler) {
+	for ($i = 0; $i<10; $i++) {
+		$temp = Random::newCryptographicRandom(16);
+		if(!$handler->accessTokenExists($temp)) {
+			return $temp;
+		}
+	}
+	echo "Error with token generation.";
 }
 
 function get_unique_token($handler) {

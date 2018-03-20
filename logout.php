@@ -20,7 +20,6 @@ if (isset($_COOKIE['cas_auth'])) {
 
 unset($_SESSION["uid"]);
 
-$response = new UserResponse("successfulLogout");
-$response->redirect();
+new UserResponse("successfulLogout");
 
 ?>

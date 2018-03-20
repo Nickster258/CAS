@@ -19,8 +19,8 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 		$valid_name = is_valid_name($_POST["name"]);
 		$valid_email = is_valid_email($_POST["email"]);
 		if ($valid_name && $valid_email && (strlen($_POST["pass"]) > 7)) {
-			$hash = password_hash(utf8_decode($_POST["pass"]), PASSWORD_BCRYPT);
-			if (password_verify(utf8_decode($_POST["verified_pass"]), $hash)) {
+			$hash = password_hash($_POST["pass"], PASSWORD_BCRYPT);
+			if (password_verify($_POST["verified_pass"], $hash)) {
 				$_SESSION["name"] = $valid_name;
 				$_SESSION["email"] = $valid_email;
 				unset($_SESSION["token"]);
@@ -30,19 +30,15 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
 					//send_verification_email($email, $email_token);
-					$response = new RegistrationResponse("registrationSuccess");
-					$response->redirect();
+					new RegistrationResponse("registrationSuccess");
 				} else {
-					$response = new RegistrationResponse("alreadyRegistered");
-					$response->redirect();
+					new RegistrationResponse("alreadyRegistered");
 				}
 			} else {
-				$response = new RegistrationResponse("passwordMismatch");
-				$response->redirect();
+				new RegistrationResponse("passwordMismatch");
 			}
 		} else {
-			$response = new RegistrationResponse("invalidFormatting");
-			$response->redirect();
+			new RegistrationResponse("invalidFormatting");
 		}
 	} else if (isset($_GET["token"])) {
 		$token = $_GET["token"];
@@ -55,16 +51,13 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 					$location = "Location: " . URL . "index.php";
 					header ($location);
 				} else {
-					$response = new RegistrationResponse("muuidRegistered");
-					$response->redirect();
+					new RegistrationResponse("muuidRegistered");
 				}	
 			} else {
-				$response = new RegistrationResponse("noMUuid");
-				$response->redirect();
+				new RegistrationResponse("noMUuid");
 			}
 		} else {
-			$response = new RegistrationResponse("invalidToken");
-			$response->redirect();
+			new RegistrationResponse("invalidToken");
 		}
 	} else {
 		header ("Location: " . $URL . "index.php");

@@ -18,30 +18,25 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 	if (isset($_SESSION["uid"]) && isset($_POST["old_pass"]) && isset($_POST["new_pass"]) && isset($_POST["new_pass_verify"])) {
 		$uid = $_SESSION["uid"];
 		$hash = $handler->fetchHashFromUid($uid);
-		if (password_verify(utf8_decode($_POST["old_pass"]), $hash)) {
-			$new_hash = password_hash(utf8_decode($_POST["new_pass"]), PASSWORD_BCRYPT);
+		if (password_verify($_POST["old_pass"], $hash)) {
+			$new_hash = password_hash($_POST["new_pass"], PASSWORD_BCRYPT);
 			echo $new_hash;
-			if (password_verify(utf8_decode($_POST["new_pass_verify"]), $new_hash)) {
+			if (password_verify($_POST["new_pass_verify"], $new_hash)) {
 				$handler->setNewPass($uid, $new_hash);
-				$response = new UserResponse("settingsUpdated");
-				$response->redirect();
+				new UserResponse("settingsUpdated");
 			} else {
-				$response = new UserResponse("passwordMismatch");
-				$response->redirect();
+				new UserResponse("passwordMismatch");
 			}
 		} else {
-			$response = new UserResponse("incorrectPassword");
-			$response->redirect();
+			new UserResponse("incorrectPassword");
 		}
 	} else if (isset($_COOKIE['cas_auth'])) {
 		$uid = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
 		if($uid) {
-			$response = new UserResponse("alreadyLogged");
-			$response->redirect();
+			new UserResponse("alreadyLogged");
 			$_SESSION["uid"] = $uid;
 		} else {
-			$response = new UserResponse("invalidCookie");
-			$response->redirect();
+			new UserResponse("invalidCookie");
 		}
 	} else if (isset($_POST["email"]) && isset($_POST["pass"])) {
 		$valid_email = is_valid_email($_POST["email"]);
@@ -57,15 +52,12 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 					$handler->setAuthToken($uid, $remember_me_token, $remember_me_time);
 					setcookie("cas_auth", $remember_me_token, $remember_me_time, "/", $MYDOMAIN);
 				}
-				$response = new UserResponse("successfulLogin");
-				$response->redirect();
+				new UserResponse("successfulLogin");
 			} else {
-				$response = new UserResponse("invalidInformation");
-				$response->redirect();
+				new UserResponse("invalidInformation");
 			}
 		} else {
-			$response = new UserResponse("invalidFormatting");
-			$response->redirect();
+			new UserResponse("invalidFormatting");
 		}
 	} else {
 		header ("Location: " . $URL . "index.php");

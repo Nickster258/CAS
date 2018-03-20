@@ -31,7 +31,7 @@ class Response {
 		];
 
 		$_SESSION["response"] = $this->formatted_response;
-
+		$this->redirect();
 	}
 
 	public function redirect() {
