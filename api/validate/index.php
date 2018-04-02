@@ -32,7 +32,7 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		$client_token = $input->clientToken;
 	}
 	$details = $handler->apiGetAccessDetails($access_token);
-	if(($client_token == $details[0]['client_token']) && $details) {
+	if(($client_token == $details['client_token']) && $details) {
 		new ApiResponse([], 204);
 	} else {
 		new ErrorResponse(

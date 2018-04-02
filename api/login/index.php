@@ -25,10 +25,10 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 	if (strlen($token) == 64) {
 		if ($uid = $handler->fetchUidFromToken($token)) {
 			$user = $handler->fetchDetailsFromUid($uid);
-			$uuid = $user[0]['uuid'];
-			$m_uuid = $user[0]['m_uuid'];
-			$name = $user[0]['username'];
-			$email = $user[0]['email'];
+			$uuid = $user['uuid'];
+			$m_uuid = $user['m_uuid'];
+			$name = $user['username'];
+			$email = $user['email'];
 			new ApiResponse([
 				"user" => [
 					"uuid" => $uid,
