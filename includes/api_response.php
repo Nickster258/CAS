@@ -11,24 +11,25 @@ class ApiResponse {
 
 	public $data;
 
-	public function __construct($input) {
+	public function __construct($input, $response_code) {
 		if (isset($input)) {
 			$this->data = $input;
-		} else {
-			$this->data = [
+			/*[
 				'Status' => 'OK',
 				'Application-Author' => 'Nickster258',
 				'Application-Description' => 'Central Authentication Service',
 				'Application-Owner' => 'Nickster258',
-			];
+			];*/
 		}
-		$this->respond(200);
+		$this->respond($response_code);
 	}
 
 	public function respond($response_code) {
 		http_response_code($response_code);
 		header ('Content-Type: application/json');
-		print_r(json_encode($this->data));
+		if(isset($this->data)) {
+			print_r(json_encode($this->data));
+		}
 	}
 
 }
@@ -47,8 +48,8 @@ class ErrorResponse extends ApiResponse {
 
 class GeneralResponse extends ApiResponse {
 
-	public function __construct($input) {
-		parent::__construct($input);
+	public function __construct($input, $response_code) {
+		parent::__construct($input, $response_code);
 	}
 }
 

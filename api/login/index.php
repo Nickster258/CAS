@@ -18,21 +18,42 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		null
 	);
 } elseif ($input = valid_json('php://input')) {
-	if (!isset($input->accessToken)) {
+	$token = false;
+	if (isset($input->cookie)) {
+		$token = $input->cookie;
+	}
+	if (strlen($token) == 64) {
+		if ($uid = $handler->fetchUidFromToken($token)) {
+			$user = $handler->fetchDetailsFromUid($uid);
+			$uuid = $user[0]['uuid'];
+			$m_uuid = $user[0]['m_uuid'];
+			$name = $user[0]['username'];
+			$email = $user[0]['email'];
+			new ApiResponse([
+				"user" => [
+					"uuid" => $uid,
+					"m_uuid" => $m_uuid,
+					"name" => $name,
+					"email" => $email
+				]
+			], 200);
+		} else {
+			new ErrorResponse(
+				400,
+				"Invalid Cookie",
+				"The cookie is either incorrect or no longer valid",
+				null
+			);
+		}
+	} else {
 		new ErrorResponse(
 			400,
-			"Invalid Parameters",
-			"AccessToken not provided",
+			"Invalid Cookie Parameter",
+			"There was an error with the cookie field.",
 			null
 		);
 	}
-	$access_token = $input->accessToken;
-	$client_token = $input->clientToken;
-	if($handler->apiRemoveTokenPair($access_token, $client_token)) {
-		new ApiResponse(null,204);
-	} else {
-		new ApiResponse([],500);
-	}	
+
 } else {
 	new ErrorResponse(
 		400,

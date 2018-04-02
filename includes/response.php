@@ -141,7 +141,6 @@ class UserResponse extends Response {
 		$this->message = "You are not authorized to view this";
 		$this->status = "failure";
 		$this->location = "generic";
-		$this->target = URL . "index.php";
 	}
 }
 

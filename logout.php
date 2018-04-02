@@ -15,7 +15,7 @@ session_start();
 if (isset($_COOKIE['cas_auth'])) {
 	$handler->removeAuthToken($_COOKIE['cas_auth']);
 	unset($_COOKIE['cas_auth']);
-	setcookie('cas_auth', null, -1, "/", $MYDOMAIN);
+	setcookie('cas_auth', null, -1, "/", DOMAIN);
 }
 
 unset($_SESSION["uid"]);

@@ -144,7 +144,7 @@ $handler = new DatabaseHandler($pdo);
 
 session_start();
 
-verify_login();
+verify_login($handler);
 
 if(!isset($_SESSION["uid"])) {
 	new UserResponse("notAuthorized");
@@ -165,11 +165,11 @@ if (isset($_SESSION["uid"])) {
 
 	echo "<div class=\"subtitle\"><span class=\"bold\">U</span>ser</div>
 	<div class=\"input_style\">Mojang UUID</div>
-	<div class=\"user_content\">" . $_SESSION["m_uuid"] . "</div> 
+	<div class=\"user_content\">" . htmlspecialchars($_SESSION["m_uuid"]) . "</div> 
 	<div class=\"input_style\">Name</div>
-	<div class=\"user_content\">" . $handler->fetchNameFromUid($_SESSION["uid"]) . "</div>
+	<div class=\"user_content\">" . htmlspecialchars($_SESSION["name"]) . "</div>
 	<div class=\"input_style\">Email</div>
-	<div class=\"user_content\">" . $handler->fetchEmailFromUid($_SESSION["uid"]) . "</div>
+	<div class=\"user_content\">" . htmlspecialchars($_SESSION["email"]) . "</div>
 	<hr>
 	<div class=\"subtitle\"><span class=\"bold\">R</span>eset <span class=\"bold\">P</span>assword</div>
 	<form action=\"login.php\" method=\"post\">

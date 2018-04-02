@@ -9,24 +9,26 @@ require_once 'database.php';
 require_once 'random.php';
 
 function valid_json($raw) {
-	$decoded = json_decode($raw);
-	//if(!is_array($decoded)) {
-	//	return false;
-	//}
-	//return true;
-	return (json_last_error() == JSON_ERROR_NAME);
+	$decoded = json_decode(preg_replace('/\s+/','',file_get_contents($raw)));
+	if (json_last_error() === JSON_ERROR_NONE) {
+		return $decoded;
+	}
+	return false;
 }
 
 function verify_login($handler) {
 	if (isset($_COOKIE['cas_auth'])) {
+		$current_time = time();
+		$token_time = $handler->fetchTimeFromToken($_COOKIE['cas_auth']) + 5184000;
+		if ($token_time < $current_time) {
+			header("Location: " . URL . "logout.php");
+		}
 		if (!isset($_SESSION["uid"])) {
 			$_SESSION["uid"] = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
-		}
-		if (!isset($_SESSION["m_uuid"])) {
-			$_SESSION["m_uuid"] = $handler->fetchMUuidFromUid($_SESSION["uid"]);
-		}
-		if (!isset($_SESSION["email"])) {
-			$_SESSION["email"] = $handler->fetchEmailFromUid($_SESSION["uid"]);
+			$details = $handler->fetchDetailsFromUid($_SESSION['uid']);
+			$_SESSION["m_uuid"] = $details['m_uuid'];
+			$_SESSION["email"] = $details['email'];
+			$_SESSION["name"] = $details['username'];
 		}
 	}
 }
@@ -58,7 +60,7 @@ function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 function get_unique_access_token($handler) {
 	for ($i = 0; $i<10; $i++) {
 		$temp = Random::newCryptographicRandom(16);
-		if(!$handler->accessTokenExists($temp)) {
+		if(!$handler->apiAccessTokenExists($temp)) {
 			return $temp;
 		}
 	}
