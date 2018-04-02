@@ -1,0 +1,6 @@
+database: database_name
+username: username
+password: password
+host: localhost:3306
+length: 16
+timeout: 1800

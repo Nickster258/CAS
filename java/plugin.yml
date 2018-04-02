@@ -1,0 +1,10 @@
+name: Auth
+main: org.stonecipher.plugin.token.Main
+version: 1.0.4
+author: Nickster258
+commands:
+    auth:
+        description: Command to generate a login token for schems
+        usage: /<command> To get a login token for schems
+        permission: auth.tokengen
+        permission-message: You don't have <permission>

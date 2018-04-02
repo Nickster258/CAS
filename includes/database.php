@@ -420,7 +420,7 @@ class DatabaseHandler {
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), time INTEGER(12), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INTEGER(12), UNIQUE KEY(m_uuid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_apitokens(access_token VARCHAR(32), client_token VARCHAR(128), uid VARCHAR(32), time INTEGER(12), UNIQUE KEY(access_token))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_groups(group_level INTEGER(4), group_name VARCHAR(32), level_ingame INTEGER(4), level_irc INTEGER(4), level_logs INTEGER(4), UNIQUE KEY(group_level))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_groups(group_level INTEGER(4), group_name VARCHAR(32), level_ingame INTEGER(4), level_irc INTEGER(4), level_logs BOOLEAN, UNIQUE KEY(group_level))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
 			return $e->getMessage();

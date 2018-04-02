@@ -28,7 +28,6 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$uid = get_unique_id($handler);
 				$m_uuid = $_SESSION["m_uuid"];
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
-					echo "he";
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
 					//send_verification_email($email, $email_token);
 					new RegistrationResponse("registrationSuccess");
