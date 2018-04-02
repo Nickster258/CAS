@@ -33,6 +33,7 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		$uid = $handler->fetchUidFromEmail($valid_email);
 		$hash = $handler->fetchHashFromUid($uid);
 		if (password_verify($password, $hash)) {
+			$handler->removeApiTokens($uid);
 			new ApiResponse([],204);
 		} else {
 			new ErrorResponse(

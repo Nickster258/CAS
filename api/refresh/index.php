@@ -28,14 +28,31 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 	}
 	$access_token = $input->accessToken;
 	$client_token = $input->clientToken;
-	$client_token = $input->clientToken;
-	$request_user = $input->requestUser;
 	$details = $handler->apiGetAccessDetails($access_token);
 	if($details) {
-		if (strcmp($client_token, $details[0]['client_token']) === 0) {
+		if (strcmp($client_token, $details['client_token']) === 0) {
+			$user_details = $handler->fetchDetailsFromUid($details['uid']);
+			$group_details = $handler->fetchGroupDetails($user_details['group_level']);
 			$access_token = get_unique_access_token($handler);
 			$handler->apiUpdateAccessToken($access_token, $client_token);
-			new ApiResponse([],204);
+			new ApiResponse([
+				"accessToken" => $access_token,
+				"clientToken" => $client_token,
+				"user" => [
+					"uuid" => $user_details['uid'],
+					"m_uuid" => $user_details['m_uuid'],
+					"name" => $user_details['username']
+				],
+				"group" => [
+					"level" => $group_details['group_level'],
+					"name" => $group_details['group_name'],
+					"permissions" => [
+						"ingame" => $group_details['level_ingame'],
+						"irc" => $group_details['level_irc'],
+						"logs" => boolval($group_details['level_logs'])
+					]
+				]
+			],200);
 		} else {
 			new ErrorResponse(
 				400,

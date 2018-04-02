@@ -14,12 +14,6 @@ class ApiResponse {
 	public function __construct($input, $response_code) {
 		if (isset($input)) {
 			$this->data = $input;
-			/*[
-				'Status' => 'OK',
-				'Application-Author' => 'Nickster258',
-				'Application-Description' => 'Central Authentication Service',
-				'Application-Owner' => 'Nickster258',
-			];*/
 		}
 		$this->respond($response_code);
 	}
