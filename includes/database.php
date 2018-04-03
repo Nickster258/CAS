@@ -200,13 +200,13 @@ class DatabaseHandler {
 		$query->bindParam(':email', $email);
 		$query->execute();
 
-		$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, expires) VALUES (:uid, :email, :email_token, :time)');
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':email', $email);
-		$query->bindParam(':email_token', $email_token);
-		$time = time();
-		$query->bindParam(':time', $time);
-		$query->execute();
+		//$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, expires) VALUES (:uid, :email, :email_token, :time)');
+		//$query->bindParam(':uid', $uid);
+		//$query->bindParam(':email', $email);
+		//$query->bindParam(':email_token', $email_token);
+		//$time = time();
+		//$query->bindParam(':time', $time);
+		//$query->execute();
 	}
 
 	/* Sets an authentication token relative
