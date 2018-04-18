@@ -76,6 +76,27 @@ class UserResponse extends Response {
 			case "notAuthorized":
 				$this->notAuthorized();
 				break;
+			case "invalidResetToken":
+				$this->invalidResetToken();
+				break;
+			case "resetPasswordMismatch":
+				$this->resetPasswordMismatch();
+				break;
+			case "passwordResetRequest":
+				$this->passwordResetRequest();
+				break;
+			case "noEmailFound":
+				$this->noEmailFound();
+				break;
+			case "successfulLogout":
+				$this->successfulLogout();
+				break;
+			case "successfulVerification":
+				$this->successfulVerification();
+				break;
+			case "invalidEmailToken":
+				$this->invalidEmailToken();
+				break;
 		}
 		Response::assembleArray();
 	}
@@ -120,25 +141,64 @@ class UserResponse extends Response {
 		$this->message = "Your settings have been updated";
 		$this->status = "success";
 		$this->location = "generic";
-		$this->target = URL . "user.php";
+		$this->target = URL . "settings.php";
 	}
 
 	public function passwordMismatch() {
 		$this->message = "Your passwords do not match";
 		$this->status = "failure";
 		$this->location = "settings_form";
-		$this->target = URL . "user.php";
+		$this->target = URL . "settings.php";
 	}
 
 	public function incorrectPassword() {
 		$this->message = "You have entered an incorrect password";
 		$this->status = "failure";
 		$this->location = "settings_form";
-		$this->target = URL . "user.php";
+		$this->target = URL . "settings.php";
 	}
 
 	public function notAuthorized() {
 		$this->message = "You are not authorized to view this";
+		$this->status = "failure";
+		$this->location = "generic";
+	}
+
+	public function invalidResetToken() {
+		$this->message = "Invalid reset token";
+		$this->status = "failure";
+		$this->location = "settings_form";
+		$this->target = URL . "settings.php?method=resetPass";
+	}
+
+	public function resetPasswordMismatch() {
+		$this->message = "Your passwords do not match";
+		$this->status = "failure";
+		$this->location = "settings_form";
+		$this->target = URL . "settings.php?method=resetPass";
+	}
+
+	public function passwordResetRequest() {
+		$this->message = "Reset email sent";
+		$this->status = "success";
+		$this->location = "generic";
+	}
+
+	public function noEmailFound() {
+		$this->message = "That email is not registered";
+		$this->status = "failure";
+		$this->location = "settings_form";
+		$this->target = "settings.php?method=requestReset";
+	}
+
+	public function successfulVerification() {
+		$this->message = "Your account has been verified";
+		$this->status = "success";
+		$this->location = "generic";
+	}
+
+	public function invalidEmailToken() {
+		$this->message = "Invalid email token";
 		$this->status = "failure";
 		$this->location = "generic";
 	}
@@ -157,7 +217,7 @@ class RegistrationResponse extends Response {
 				$this->noMUuid();
 				break;
 			case "invalidFormatting":
-				$this->invalidFormating();
+				$this->invalidFormatting();
 				break;
 			case "passwordMismatch":
 				$this->passwordMismatch();
@@ -225,29 +285,6 @@ class RegistrationResponse extends Response {
 		$this->message = "You have successfully registered. Please log in to continue.";
 		$this->status = "success";
 		$this->location = "generic";
-	}
-}
-
-class InternalResponse extends Response {
-
-	public function __construct($type, $data) {
-		$this->type = $type;
-		switch($type) {
-			case "tokenGenerationError":
-				tokenGenerationError($data);
-				break;
-			case "uidGenerationError":
-				uidGenerationError($data);
-				break;
-		}
-	}
-
-	public function tokenGenerationError($data) {
-
-	}
-
-	public function uidGenerationError($data) {
-
 	}
 }
 ?>

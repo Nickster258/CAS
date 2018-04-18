@@ -1,196 +1,169 @@
-<html>
-<head>
-<meta name="viewport" content="width=device-width">
-<style>
-.outer {
-	display: table;
-	position: relative;
-	height: 100%;
-	width: 100%;
-}
-.middle {
-	display: table-cell;
-	vertical-align: middle;
-}
-.inner {
-	margin-left: auto;
-	margin-right: auto;
-	width: 100%;
-	max-width: 350px;
-	overflow: hidden;
-	font-size: 26px;
-}
-* {
-	font-family:Verdana;
-	background-color: #E5E8EA;
-	text-align: center;
-	color: #443D35
-}
-a {
-	text-decoration: none;
-}
-a:hover {
-	text-decoration: none;
-	color: #821200;
-}
-.button {
-	background-color: #a71700;
-	border: none;
-	color: white;
-	padding: 10px 16px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 16px;
-	margin: 4px 2px;
-	cursor: pointer;
-	margin-top: 16px;
-	width: 60%;
-}
-.button:hover {
-	background-color: #821200;
-}
-.input {
-	background-color: white;
-	border: none;
-	color: black;
-	padding: 10px 16px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 16px;
-	margin: 4px 2px;
-	border: 1px solid #a71700;
-	border-radius: 2px;
-	width:320px;
-	margin-bottom:20px;
-}
-.linkFormat {
-	text-decoration: none;
-	color: #4CAF50;
-}
-p {
-	font-size: 20px;
-	text-align: left;
-}
-.input_style {
-	width: 320px;
-	font-size: 12px;
-	text-align: left;
-	padding-left: 20px;
-}
-.user_content {
-	width: 100%;
-	font-size: 11px;
-	padding-top: 5px;
-}
-.bold {
-	font-weight: bold;
-}
-.title {
-	margin-bottom: 10px;
-}
-.subtitle {
-	margin-bottom: 10px;
-	font-size: 16;
-}
-.welcomeback {
-	font-size: 12;
-	margin-bottom: 20px;
-}
-.logout {
-	font-size: 11;
-	margin-bottom: 20px;
-}
-.name {
-	color: #a71700;
-}
-#footer {
-	padding-top: 10px;
-	font-size: 10px;
-}
-.failure {
-	font-size: 14px;
-	padding-top: 10px;
-	color: red;
-}
-.success {
-	font-size: 14px;
-	padding-top: 10px;
-	color: green;
-}
-.neutral {
-	font-size: 10px;
-	padding-top: 10px;
-}
-</style>
-<link rel="icon" href="favi.png"/>
-<title>CAS</title>
-</head>
-<body>
-
 <?php
 
-define ('IN_CAS', true);
+define('IN_CAS', true);
 
+require_once 'includes/email.php';
 require_once 'includes/constants.php';
+require_once 'includes/random.php';
 require_once 'includes/database.php';
 require_once 'includes/response.php';
 require_once 'includes/utilities.php';
 
 global $pdo;
+global $email;
 
 $handler = new DatabaseHandler($pdo);
 
 session_start();
 
-verify_login($handler);
-
-if(!isset($_SESSION["uid"])) {
-	new UserResponse("notAuthorized");
+if(!isset($_GET["method"])) {
+	die("No method specified");
+}
+switch($_GET["method"]) {
+	case "resetPass":
+		if (is_post()) {
+			resetPass($handler, $email);
+		}
+		break;
+	case "setPass":
+		if (is_post()) {
+			setPass($handler);
+		}
+		break;
+	case "login":
+		if (is_post()) {
+			login($handler);
+		}
+		break;
+	case "sendReset":
+		if (is_post()) {
+			sendReset($handler, $email);
+		}
+		break;
+	case "verify":
+		verify($handler);
+		break;
+	case "logout":
+		logout($handler);
+		break;
+	default:
+		die("Unsupported request type");
 }
 
-do_response("generic");
-
-?>
-
-<div class="outer">
-<div class="middle">
-<div class="inner">
-<div class="title"><span class="bold">C</span>AS</div>
-
-<?php
-
-if (isset($_SESSION["uid"])) {
-
-	echo "<div class=\"subtitle\"><span class=\"bold\">U</span>ser</div>
-	<div class=\"input_style\">Mojang UUID</div>
-	<div class=\"user_content\">" . htmlspecialchars($_SESSION["m_uuid"]) . "</div> 
-	<div class=\"input_style\">Name</div>
-	<div class=\"user_content\">" . htmlspecialchars($_SESSION["name"]) . "</div>
-	<div class=\"input_style\">Email</div>
-	<div class=\"user_content\">" . htmlspecialchars($_SESSION["email"]) . "</div>
-	<hr>
-	<div class=\"subtitle\"><span class=\"bold\">R</span>eset <span class=\"bold\">P</span>assword</div>
-	<form action=\"login.php\" method=\"post\">
-	<div class=\"input_style\">Old Password</div> <input class=\"input\" type=\"password\" name=\"old_pass\" required><br>
-	<div class=\"input_style\">New Password</div> <input class=\"input\" type=\"password\" name=\"new_pass\" required><br>
-	<div class=\"input_style\">Verify New Password</div> <input class=\"input\" type=\"password\" name=\"new_pass_verify\" required><br>";
-
-	do_response("settings_form");
-
-	echo "<input class=\"button\" type=\"submit\" value=\"Reset\">
-	</form>
-	</p>";
-
+function resetPass($handler, $email) {
+	if (isset($_SESSION["uid"]) && isset($_POST["old_pass"]) && isset($_POST["new_pass"]) && isset($_POST["new_pass_verify"])) {
+		$uid = $_SESSION["uid"];
+		$details = $handler->fetchDetailsFromUid($uid);
+		$hash = $details['password'];
+		if (password_verify($_POST["old_pass"], $hash)) {
+			$new_hash = password_hash($_POST["new_pass"], PASSWORD_BCRYPT);
+			if (password_verify($_POST["new_pass_verify"], $new_hash)) {
+				$token = get_unique_reset_token($handler);
+				$time = time();
+				$handler->setResetToken($uid, $token, $time);
+				$handler->setNewPass($uid, $new_hash);
+				$data = ['target' => $_SESSION["email"],
+					'token' => $token];
+				$email->send($data, "passwordChange");
+				new UserResponse("settingsUpdated");
+			} else {
+				new UserResponse("passwordMismatch");
+			}
+		} else {
+			new UserResponse("incorrectPassword");
+		}
+	} 
 }
 
-echo "<hr><div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help</div>";
+function sendReset($handler, $email) {
+	if($uid = $handler->fetchUidFromEmail($_POST['email'])) {
+		$token = get_unique_reset_token($handler);
+		$time = time();
+		$handler->setResetToken($uid, $token, $time);
+		$data = ['target' => $_SESSION["email"],
+			'token' => $token];
+		$email->send($data, "passwordReset");
+		new UserResponse("passwordResetRequest");
+	} else {
+		new UserResponse("noEmailFound");
+	}
+}
 
+function setPass($handler) {
+	if (isset($_SESSION['reset_token']) && isset($_POST["new_pass"]) && isset($_POST["new_pass_verify"])) {
+		if($uid = $handler->fetchUidFromResetToken($_SESSION['reset_token'])) {
+			$hash = password_hash($_POST["new_pass"], PASSWORD_BCRYPT);
+			if (password_verify($_POST["new_pass_verify"], $hash)) {
+				$handler->setNewPass($uid, $hash);
+				$handler->removeResetToken($_SESSION['reset_token']);
+				unset($_SESSION['reset_token']);
+				new UserResponse("settingsUpdated");
+			} else {
+				new UserResponse("resetPasswordMismatch");
+			}
+		} else {
+			new UserResponse("invalidResetToken");
+		}
+	} else {
+		echo "missing required data";
+	}
+}
+
+function login($handler) { 
+	if (isset($_COOKIE['cas_auth'])) {
+		$uid = $handler->fetchUidFromToken($_COOKIE['cas_auth']);
+		if($uid) {
+			new UserResponse("alreadyLogged");
+			$_SESSION["uid"] = $uid;
+		} else {
+			new UserResponse("invalidCookie");
+		}
+	} else if (isset($_POST["email"]) && isset($_POST["pass"])) {
+		$valid_email = is_valid_email($_POST["email"]);
+		if ($valid_email && (strlen($_POST["pass"]) > 7)) {
+			$uid = $handler->fetchUidFromEmail($valid_email);
+			$details = $handler->fetchDetailsFromUid($uid);
+			$hash = $details['password'];
+			if (password_verify($_POST["pass"], $hash)) {
+				$_SESSION["uid"] = $uid;
+				$_SESSION["m_uuid"] = $details['m_uuid'];
+				$_SESSION["name"] = $details['username'];
+				$_SESSION["email"] = $details['email'];
+				if(isset($_POST['rememberme'])) {
+					$remember_me_time = time();
+					$expire_time = $remember_me_time + 5184000;
+					$remember_me_token = Random::newCryptographicRandom(32);
+					$handler->setAuthToken($uid, $remember_me_token, $remember_me_time);
+					setcookie("cas_auth", $remember_me_token, $expire_time, "/", DOMAIN);
+				}
+				new UserResponse("successfulLogin");
+			} else {
+				new UserResponse("invalidInformation");
+			}
+		} else {
+			new UserResponse("invalidFormatting");
+		}
+	} else {
+		header ("Location: " . $URL . "index.php");
+	}
+}	
+
+function logout($handler) {
+	if (isset($_COOKIE['cas_auth'])) {
+		$handler->removeAuthToken($_COOKIE['cas_auth']);
+		unset($_COOKIE['cas_auth']);
+		setcookie('cas_auth', null, -1, "/", DOMAIN);
+	}
+	unset($_SESSION["uid"]);
+	new UserResponse("successfulLogout");
+}
+
+function verify($handler) {
+	if ($uid = $handler->fetchUidFromEmailToken($_GET['token'])) {
+		$handler->verifyUser($uid);
+		new UserResponse("successfulVerification");
+	} else {
+		new UserResponse("invalidEmailToken");
+	}
+}
 ?>
-
-</div>
-</div>
-</div>
-</body>
-</html>

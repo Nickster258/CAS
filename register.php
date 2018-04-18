@@ -7,9 +7,10 @@ require_once 'includes/random.php';
 require_once 'includes/database.php';
 require_once 'includes/response.php';
 require_once 'includes/utilities.php';
+require_once 'includes/email.php';
 
+global $email;
 global $pdo;
-
 $handler = new DatabaseHandler($pdo);
 
 session_start();
@@ -29,7 +30,10 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$m_uuid = $_SESSION["m_uuid"];
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
-					//send_verification_email($email, $email_token);
+					$email->send([
+						'token' => $email_token,
+						'target' => $valid_email],
+						"emailVerification");
 					new RegistrationResponse("registrationSuccess");
 				} else {
 					new RegistrationResponse("alreadyRegistered");

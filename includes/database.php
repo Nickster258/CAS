@@ -91,6 +91,19 @@ class DatabaseHandler {
 		}
 	}
 
+	/* Checks if the reset token exists
+	 */
+	public function resetTokenExists($token) {
+		$query = $this->pdo->prepare('SELECT * FROM auth_resettokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return true;
+		}
+		return false;
+	}
+
 	/* Checks if the access_token for the
 	 * api exists
 	 */
@@ -188,6 +201,21 @@ class DatabaseHandler {
 		}
 	}
 
+	/* Sets a reset token for use with the
+	 * affiliate uid
+	 */
+	public function setResetToken($uid, $token, $time) {
+		try {
+		$query = $this->pdo->prepare('INSERT INTO auth_resettokens(uid, token, time) VALUES(:uid, :token, :time)');
+		$query->bindParam(':uid', $uid);
+		$query->bindParam(':token', $token);
+		$query->bindParam(':time', $time);
+		$query->execute();
+		} catch (Exception $e) {
+			print_r($e->getMessage());
+		}
+	}
+
 	/* Sets an unverified user in auth_users
 	 * and in auth_emailtokens
 	 */
@@ -200,13 +228,13 @@ class DatabaseHandler {
 		$query->bindParam(':email', $email);
 		$query->execute();
 
-		//$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, expires) VALUES (:uid, :email, :email_token, :time)');
-		//$query->bindParam(':uid', $uid);
-		//$query->bindParam(':email', $email);
-		//$query->bindParam(':email_token', $email_token);
-		//$time = time();
-		//$query->bindParam(':time', $time);
-		//$query->execute();
+		$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, time) VALUES (:uid, :email, :email_token, :time)');
+		$query->bindParam(':uid', $uid);
+		$query->bindParam(':email', $email);
+		$query->bindParam(':email_token', $email_token);
+		$time = time();
+		$query->bindParam(':time', $time);
+		$query->execute();
 	}
 
 	/* Sets an authentication token relative
@@ -222,6 +250,20 @@ class DatabaseHandler {
 		} catch (Exception $e) {
 			print_r($e->getMessage());
 		}
+	}
+
+	/* Fetches the uid with with the
+	 * affiliated token
+	 */
+	public function fetchUidFromResetToken($token) {
+		$query = $this->pdo->prepare('SELECT uid FROM auth_resettokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['uid'];
+		}
+		return false;
 	}
 
 	/* Fetches the time the token
@@ -395,6 +437,14 @@ class DatabaseHandler {
 		return false;
 	}
 
+	/* Calls to remove the reset token
+	 */
+	public function removeResetToken($token) {
+		$query = $this->pdo->prepare('DELETE FROM auth_resettokens WHERE token = :token');
+		$query->bindParam(':token', $token);
+		$query->execute();
+	}
+
 	/* Calls to remove the token from the database 
 	 * affiliated with the token data
 	 */
@@ -415,12 +465,13 @@ class DatabaseHandler {
 
 	public function setup() {
 		try {
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), time INTEGER(12))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_tokens(uid VARCHAR(32), token VARCHAR(64), time INTEGER(12), UNIQUE KEY(token))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_users(uid VARCHAR(32), m_uuid VARCHAR(32), username VARCHAR(32), password VARCHAR(60), email VARCHAR(128), verified BOOLEAN, group_level INTEGER(4), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_emailtokens(uid VARCHAR(32), email VARCHAR(64), email_token VARCHAR(16), time INTEGER(12), UNIQUE KEY(uid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INTEGER(12), UNIQUE KEY(m_uuid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_apitokens(access_token VARCHAR(32), client_token VARCHAR(128), uid VARCHAR(32), time INTEGER(12), UNIQUE KEY(access_token))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_groups(group_level INTEGER(4), group_name VARCHAR(32), level_ingame INTEGER(4), level_irc INTEGER(4), level_logs BOOLEAN, UNIQUE KEY(group_level))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_resettokens(uid VARCHAR(32), token VARCHAR(16), time INTEGER(12), UNIQUE KEY(uid))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
 			return $e->getMessage();

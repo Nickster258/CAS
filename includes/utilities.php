@@ -8,6 +8,13 @@ if(!defined('IN_CAS')) {
 require_once 'database.php';
 require_once 'random.php';
 
+function is_post() {
+	if(strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'), 'POST') == 0) {
+		return true;
+	}
+	return false;
+}
+
 function valid_json($raw) {
 	$decoded = json_decode(preg_replace('/\s+/','',file_get_contents($raw)));
 	if (json_last_error() === JSON_ERROR_NONE) {
@@ -30,6 +37,11 @@ function verify_login($handler) {
 			$_SESSION["email"] = $details['email'];
 			$_SESSION["name"] = $details['username'];
 		}
+	} elseif (isset($_SESSION['uid'])) {
+		$details = $handler->fetchDetailsFromUid($_SESSION['uid']);
+		$_SESSION["m_uuid"] = $details['m_uuid'];
+		$_SESSION["email"] = $details['email'];
+		$_SESSION["name"] = $details['username'];
 	}
 }
 
@@ -55,6 +67,16 @@ function register_new_user($m_uuid, $name, $hash, $email, $handler) {
 		echo "That Mojang UUID, Name, or email has already been registered";
 		session_destroy();
 	}
+}
+
+function get_unique_reset_token($handler) {
+	for ($i = 0; $i<10; $i++) {
+		$temp = Random::newCryptographicRandom(8);
+		if(!$handler->resetTokenExists($temp)) {
+			return $temp;
+		}
+	}
+	echo "Error with token generation.";
 }
 
 function get_unique_access_token($handler) {

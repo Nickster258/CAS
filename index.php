@@ -160,7 +160,7 @@ if (isset($_SESSION["uid"])) {
 
 	$username = $handler->fetchNameFromUid($_SESSION["uid"]);
 	echo "<div class=\"welcomeback\">Welcome back, <span class=\"name\">" . $username . "</span></div>
-	<div class=\"logout\"><a href=\"" . URL . "logout.php\">Logout</a> | <a href=\"" . URL . "user.php\">Settings</a></div>";
+	<div class=\"logout\"><a href=\"" . URL . "user.php?method=logout\">Logout</a> | <a href=\"" . URL . "settings.php\">Settings</a></div>";
 
 } else if (isset($_SESSION["m_uuid"]) && isset($_SESSION["token"])) {
 
@@ -182,10 +182,10 @@ if (isset($_SESSION["uid"])) {
 } else {
 
 	echo "<div class=\"subtitle\"><span class=\"bold\">L</span>ogin</div>
-	<form action=\"login.php\" method=\"post\">
+	<form action=\"user.php?method=login\" method=\"post\">
 	<div class=\"input_style\">Email</div> <input class=\"input\" type=\"email\" name=\"email\" required><br>
 	<div class=\"input_style\">Password</div> <input class=\"input\" type=\"password\" name=\"pass\" required><br>
-	<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"></div>";
+	<div class=\"input_style\">Remember Me <input type=\"checkbox\" name=\"rememberme\"><div style=\"float:right;padding:3px 15px 0 0;\"><a href=\"" . URL . "settings.php?method=requestReset\">Forgot Password?</a></div></div>";
 
 	do_response("login_form");
 
@@ -195,7 +195,7 @@ if (isset($_SESSION["uid"])) {
 
 }
 
-echo "<hr><div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help </div>";
+	echo "<hr><div id=\"footer\"><a href=\"" . URL . "terms.php\">Terms</a> | <a href=\"https://github.com/Nickster258/CAS\">Source</a> | Contact Help </div>";
 
 ?>
 
