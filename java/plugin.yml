@@ -1,6 +1,6 @@
 name: Auth
 main: org.stonecipher.plugin.token.Main
-version: 1.0.4
+version: 1.0.5
 author: Nickster258
 commands:
     auth:
