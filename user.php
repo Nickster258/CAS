@@ -84,7 +84,7 @@ function sendReset($handler, $email) {
 		$handler->setResetToken($uid, $token, $time);
 		$username = $handler->fetchNameFromUid($uid);
 		$data = [
-			'user' => $_SESSION["username"],
+			'user' => $username,
 			'target' => $_POST["email"],
 			'token' => $token];
 		$email->send($data, "passwordReset");
