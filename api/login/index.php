@@ -1,7 +1,7 @@
 <?php
 
 define('IN_CAS', true);
-require_once 'includes/constants.php';
+require_once '../../includes/constants.php';
 require_once ROOT_DIR . 'includes/utilities.php';
 require_once ROOT_DIR . 'includes/database.php';
 require_once ROOT_DIR . 'includes/api_response.php';
@@ -62,5 +62,4 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		null
 	);
 }
-
 ?>
