@@ -63,7 +63,7 @@ function resetPass($handler, $email) {
 				$handler->setResetToken($uid, $token, $time);
 				$handler->setNewPass($uid, $new_hash);
 				$data = [
-					'user' => $_SESSION["username"],
+					'name' => $_SESSION["username"],
 					'target' => $_SESSION["email"],
 					'token' => $token];
 				$email->send($data, "passwordChange");
@@ -84,7 +84,7 @@ function sendReset($handler, $email) {
 		$handler->setResetToken($uid, $token, $time);
 		$username = $handler->fetchNameFromUid($uid);
 		$data = [
-			'user' => $username,
+			'name' => $username,
 			'target' => $_POST["email"],
 			'token' => $token];
 		$email->send($data, "passwordReset");

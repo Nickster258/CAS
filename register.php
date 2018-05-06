@@ -30,11 +30,11 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				$m_uuid = $_SESSION["m_uuid"];
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
-					$email->send([
-						'user' => $valid_name,
+					$data = [
+						'name' => $valid_name,
 						'token' => $email_token,
-						'target' => $valid_email],
-						"emailVerification");
+						'target' => $valid_email];
+					$email->send($data, "emailVerification");
 					new RegistrationResponse("registrationSuccess");
 				} else {
 					new RegistrationResponse("alreadyRegistered");
