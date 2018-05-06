@@ -2,9 +2,9 @@
 
 define('IN_CAS', true);
 
-require_once '../../includes/utilities.php';
-require_once '../../includes/database.php';
-require_once '../../includes/api_response.php';
+require_once ROOT_DIR . 'includes/utilities.php';
+require_once ROOT_DIR . 'includes/database.php';
+require_once ROOT_DIR . 'includes/api_response.php';
 
 global $pdo;
 

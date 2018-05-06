@@ -3,11 +3,11 @@
 define('IN_CAS', true);
 
 require_once 'includes/constants.php';
-require_once 'includes/random.php';
-require_once 'includes/database.php';
-require_once 'includes/response.php';
-require_once 'includes/utilities.php';
-require_once 'includes/email.php';
+require_once ROOT_DIR . 'includes/random.php';
+require_once ROOT_DIR . 'includes/database.php';
+require_once ROOT_DIR . 'includes/response.php';
+require_once ROOT_DIR . 'includes/utilities.php';
+require_once ROOT_DIR . 'includes/email.php';
 
 global $email;
 global $pdo;
@@ -31,6 +31,7 @@ if (isset($_SERVER["REQUEST_METHOD"])) {
 				if (is_not_registered($valid_name, $valid_email, $handler)) {
 					$handler->setUnverifiedUser($uid, $m_uuid, $valid_name, $hash, $valid_email, $email_token);
 					$email->send([
+						'user' => $valid_name,
 						'token' => $email_token,
 						'target' => $valid_email],
 						"emailVerification");

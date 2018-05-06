@@ -167,8 +167,7 @@ class UserResponse extends Response {
 	public function invalidResetToken() {
 		$this->message = "Invalid reset token";
 		$this->status = "failure";
-		$this->location = "settings_form";
-		$this->target = URL . "settings.php?method=resetPass";
+		$this->location = "generic";
 	}
 
 	public function resetPasswordMismatch() {

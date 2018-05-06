@@ -134,9 +134,9 @@ p {
 define ('IN_CAS', true);
 
 require_once 'includes/constants.php';
-require_once 'includes/database.php';
-require_once 'includes/response.php';
-require_once 'includes/utilities.php';
+require_once ROOT_DIR . 'includes/database.php';
+require_once ROOT_DIR . 'includes/response.php';
+require_once ROOT_DIR . 'includes/utilities.php';
 
 global $pdo;
 
@@ -156,11 +156,15 @@ do_response("generic");
 <div class="title"><span class="bold">C</span>AS</div>
 
 <?php
-
 if (strcmp($_GET["method"], "resetPass") == 0) {
 	if(isset($_GET['token'])) {
-		$_SESSION['uid'] = $handler->fetchUidFromResetToken($_GET['token']);
-		$_SESSION['reset_token'] = $_GET['token'];
+		$uid = $handler->fetchUidFromResetToken($_GET['token']);
+		if ($uid) {
+			$_SESSION['uid'] = $uid;
+			$_SESSION['reset_token'] = $_GET['token'];
+		} else {
+			new UserResponse("invalidResetToken");
+		}
 	}
 	if($_SESSION['uid']) {
 		$uid = $_SESSION['uid'];

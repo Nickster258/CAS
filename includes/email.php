@@ -5,8 +5,7 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
-require_once "/var/www/stonecipher.org/dev/public/testauth/vendor/autoload.php";
-require_once 'constants.php';
+require_once ROOT_DIR . 'vendor/autoload.php';
 
 class Email {
 
@@ -64,21 +63,21 @@ class Email {
 	}
 
 	private function emailVerification($data) {
-		$body = "Thank you for registering!\n\nClick below to verify your email.\n\n" . URL . "verify.php?token=" . $data['token'];
+		$body = "Hello " . $data['name'] . ",\n\nThank you for registering!\n\nClick below to verify your email.\n\n" . URL . "user.php?method=verify&token=" . $data['token'] . "\n\nSincerely,\n" . SERVICE_NAME;
 		$target = $data['target'];
 		$subject = SERVICE_NAME . " - Email Verification";
 		$this->sendBasic($subject, $target, $body);
 	}
 
 	private function passwordReset($data) {
-		$body = "You have asked to reset your password. Click below to reset your password.\n\n" . URL . "settings.php?method=resetPass&token=" . $data['token'];
+		$body = "Hello " . $data['name'] . ",\n\nYou have asked to reset your password. Click below to reset your password.\n\n" . URL . "settings.php?method=resetPass&token=" . $data['token'] . "\n\nSincerely,\n" . SERVICE_NAME;
 		$target = $data['target'];
 		$subject = SERVICE_NAME . " - Password Reset";
 		$this->sendBasic($subject, $target, $body);
 	}
 
 	private function passwordChange($data) {
-		$body = "Your password has been reset. If this was not you, please click below to set a different password.\n\n" . URL . "settings.php?method=resetPass&token=" . $data['token'] . "\n\nIf this was you, you can ignore this message.";
+		$body = "Hello " . $data['name'] . ",\n\nYour password has been reset. If this was not you, please click below to set a different password.\n\n" . URL . "settings.php?method=resetPass&token=" . $data['token'] . "\n\nIf this was you, you can ignore this message.\n\nSincerely,\n" . SERVICE_NAME;
 		$target = $data['target'];
 		$subject = SERVICE_NAME . " - Password Reset Confirmation";
 		$this->sendBasic($subject, $target, $body);

@@ -2,12 +2,12 @@
 
 define('IN_CAS', true);
 
-require_once 'includes/email.php';
 require_once 'includes/constants.php';
-require_once 'includes/random.php';
-require_once 'includes/database.php';
-require_once 'includes/response.php';
-require_once 'includes/utilities.php';
+require_once ROOT_DIR . 'includes/email.php';
+require_once ROOT_DIR . 'includes/random.php';
+require_once ROOT_DIR . 'includes/database.php';
+require_once ROOT_DIR . 'includes/response.php';
+require_once ROOT_DIR . 'includes/utilities.php';
 
 global $pdo;
 global $email;
@@ -62,7 +62,9 @@ function resetPass($handler, $email) {
 				$time = time();
 				$handler->setResetToken($uid, $token, $time);
 				$handler->setNewPass($uid, $new_hash);
-				$data = ['target' => $_SESSION["email"],
+				$data = [
+					'user' => $_SESSION["username"],
+					'target' => $_SESSION["email"],
 					'token' => $token];
 				$email->send($data, "passwordChange");
 				new UserResponse("settingsUpdated");
@@ -80,7 +82,10 @@ function sendReset($handler, $email) {
 		$token = get_unique_reset_token($handler);
 		$time = time();
 		$handler->setResetToken($uid, $token, $time);
-		$data = ['target' => $_SESSION["email"],
+		$username = $handler->fetchNameFromUid($uid);
+		$data = [
+			'user' => $_SESSION["username"],
+			'target' => $_POST["email"],
 			'token' => $token];
 		$email->send($data, "passwordReset");
 		new UserResponse("passwordResetRequest");
@@ -95,7 +100,7 @@ function setPass($handler) {
 			$hash = password_hash($_POST["new_pass"], PASSWORD_BCRYPT);
 			if (password_verify($_POST["new_pass_verify"], $hash)) {
 				$handler->setNewPass($uid, $hash);
-				$handler->removeResetToken($_SESSION['reset_token']);
+				$handler->removeResetTokens($uid);
 				unset($_SESSION['reset_token']);
 				new UserResponse("settingsUpdated");
 			} else {

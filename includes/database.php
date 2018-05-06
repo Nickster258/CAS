@@ -5,8 +5,6 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
-require_once 'constants.php';
-
 class DatabaseHandler {
 	private $pdo;
 
@@ -66,14 +64,19 @@ class DatabaseHandler {
 	 * from its group ID
 	 */
 	public function fetchGroupDetails($group_level) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_groups WHERE group_level = :group_level');
-		$query->bindParam(':group_level', $group_level);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result;
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_groups WHERE group_level = :group_level');
+			$query->bindParam(':group_level', $group_level);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Removes all tokens affiliated with
@@ -87,6 +90,7 @@ class DatabaseHandler {
 			$result = $query->fetch(PDO::FETCH_ASSOC);
 			return true;
 		} catch (Exception $e) {
+			error_log($e->getMessage());
 			return false;
 		}
 	}
@@ -94,46 +98,61 @@ class DatabaseHandler {
 	/* Checks if the reset token exists
 	 */
 	public function resetTokenExists($token) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_resettokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return true;
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_resettokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return true;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Checks if the access_token for the
 	 * api exists
 	 */
 	public function apiAccessTokenExists($token) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE access_token = :access_token');
-		$query->bindParam(':access_token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return true;
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE access_token = :access_token');
+			$query->bindParam(':access_token', $token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return true;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Checks if the client_token for the
 	 * specified user exists
 	 */
 	public function apiClientTokenExists($uid, $client_token) {
-		if ($client_token == null) {
+		try {
+			if ($client_token == null) {
+				return false;
+			}
+			$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE (uid = :uid AND client_token = :client_token)');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':client_token', $client_token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return true;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
 			return false;
 		}
-		$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE (uid = :uid AND client_token = :client_token)');
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':client_token', $client_token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return true;
-		}
-		return false;
 	}
 
 	/* Removes the access and client token
@@ -154,6 +173,7 @@ class DatabaseHandler {
 			}
 			return true;
 		} catch (Exception $e) {
+			error_log($e->getMessage());
 			return false;	
 		}
 	}
@@ -168,6 +188,7 @@ class DatabaseHandler {
 			$query->execute();
 			return true;
 		} catch (Exception $e) {
+			error_log($e->getMessage());
 			return false;
 		}
 	}
@@ -176,28 +197,35 @@ class DatabaseHandler {
 	 * and access token matches
 	 */
 	public function apiGetAccessDetails($access_token) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE access_token = :access_token');
-		$query->bindParam(':access_token', $access_token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result;
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_apitokens WHERE access_token = :access_token');
+			$query->bindParam(':access_token', $access_token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Sets an access_token in api_tokens
 	 */
 	public function setAccessToken($access_token, $client_token, $uid, $time) {
 		try{ 
-		$query = $this->pdo->prepare('INSERT INTO auth_apitokens(access_token, client_token, uid, time) VALUES(:access_token, :client_token, :uid, :time)');
-		$query->bindParam(':access_token', $access_token);
-		$query->bindParam(':client_token', $client_token);
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':time', $time);
-		$query->execute();
+			$query = $this->pdo->prepare('INSERT INTO auth_apitokens(access_token, client_token, uid, time) VALUES(:access_token, :client_token, :uid, :time)');
+			$query->bindParam(':access_token', $access_token);
+			$query->bindParam(':client_token', $client_token);
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':time', $time);
+			$query->execute();
+			return true;
 		} catch (Exception $e) {
-			print_r($e->getMessage());
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 
@@ -206,13 +234,15 @@ class DatabaseHandler {
 	 */
 	public function setResetToken($uid, $token, $time) {
 		try {
-		$query = $this->pdo->prepare('INSERT INTO auth_resettokens(uid, token, time) VALUES(:uid, :token, :time)');
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':token', $token);
-		$query->bindParam(':time', $time);
-		$query->execute();
+			$query = $this->pdo->prepare('INSERT INTO auth_resettokens(uid, token, time) VALUES(:uid, :token, :time)');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':token', $token);
+			$query->bindParam(':time', $time);
+			$query->execute();
+			return true;
 		} catch (Exception $e) {
-			print_r($e->getMessage());
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 
@@ -220,21 +250,27 @@ class DatabaseHandler {
 	 * and in auth_emailtokens
 	 */
 	public function setUnverifiedUser($uid, $m_uuid, $name, $hash, $email, $email_token) {
-		$query = $this->pdo->prepare('INSERT INTO auth_users(uid, m_uuid, username, password, email, verified, group_level) VALUES(:uid, :m_uuid, :username, :password, :email, 0, 0)');
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':m_uuid', $m_uuid);
-		$query->bindParam(':username', $name);
-		$query->bindParam(':password', $hash);
-		$query->bindParam(':email', $email);
-		$query->execute();
+		try {
+			$query = $this->pdo->prepare('INSERT INTO auth_users(uid, m_uuid, username, password, email, verified, group_level) VALUES(:uid, :m_uuid, :username, :password, :email, 0, 0)');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':m_uuid', $m_uuid);
+			$query->bindParam(':username', $name);
+			$query->bindParam(':password', $hash);
+			$query->bindParam(':email', $email);
+			$query->execute();
 
-		$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, time) VALUES (:uid, :email, :email_token, :time)');
-		$query->bindParam(':uid', $uid);
-		$query->bindParam(':email', $email);
-		$query->bindParam(':email_token', $email_token);
-		$time = time();
-		$query->bindParam(':time', $time);
-		$query->execute();
+			$query = $this->pdo->prepare('INSERT INTO auth_emailtokens(uid, email, email_token, time) VALUES (:uid, :email, :email_token, :time)');
+			$query->bindParam(':uid', $uid);
+			$query->bindParam(':email', $email);
+			$query->bindParam(':email_token', $email_token);
+			$time = time();
+			$query->bindParam(':time', $time);
+			$query->execute();
+			return true;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
 	}
 
 	/* Sets an authentication token relative
@@ -247,8 +283,10 @@ class DatabaseHandler {
 			$query->bindParam(':token', $token);
 			$query->bindParam(':time', $time);
 			$query->execute();
+			return true;
 		} catch (Exception $e) {
-			print_r($e->getMessage());
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 
@@ -256,14 +294,19 @@ class DatabaseHandler {
 	 * affiliated token
 	 */
 	public function fetchUidFromResetToken($token) {
-		$query = $this->pdo->prepare('SELECT uid FROM auth_resettokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result['uid'];
+		try {
+			$query = $this->pdo->prepare('SELECT uid FROM auth_resettokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result['uid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return true;
 		}
-		return false;
 	}
 
 	/* Fetches the time the token
@@ -278,9 +321,10 @@ class DatabaseHandler {
 			if ($result) {
 				return $result['time'];
 			}
-			return 0;
+			return false;
 		} catch (Exception $e) {
-			print_r($e->getMessage());
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 	/* Sets the password for a selected
@@ -292,8 +336,10 @@ class DatabaseHandler {
 			$query->bindParam(':uid', $uid);
 			$query->bindParam(':hash', $hash);
 			$query->execute();
+			return true;
 		} catch (Exception $e) {
-			print_r($e->getMessage());
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 
@@ -307,6 +353,7 @@ class DatabaseHandler {
 			$query->execute();
 			return true;
 		} catch (PDOException $e) {
+			error_log($e->getMessage());
 			return false;
 		}
 	}
@@ -315,152 +362,215 @@ class DatabaseHandler {
 	 * specific email token
 	 */
 	public function fetchUidFromEmailToken($email_token) {
-		$query = $this->pdo->prepare('SELECT uid FROM auth_emailtokens WHERE email_token = :email_token');
-		$query->bindParam(':email_token', $email_token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return $result['uid'];
+		try {
+			$query = $this->pdo->prepare('SELECT uid FROM auth_emailtokens WHERE email_token = :email_token');
+			$query->bindParam(':email_token', $email_token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return $result['uid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the name affiliated with the
 	 * uid
 	 */
 	public function fetchNameFromUid($uid) {
-		$query = $this->pdo->prepare('SELECT username FROM auth_users WHERE uid = :uid');
-		$query->bindParam(':uid', $uid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return $result['username'];
+		try {
+			$query = $this->pdo->prepare('SELECT username FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return $result['username'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the email affiliated with the
 	 * uid
 	 */
 	public function fetchEmailFromUid($uid) {
-		$query = $this->pdo->prepare('SELECT email FROM auth_users WHERE uid = :uid');
-		$query->bindParam(':uid', $uid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return $result['email'];
+		try {
+			$query = $this->pdo->prepare('SELECT email FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return $result['email'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the uid affiliated with the
 	 * specified token
 	 */
 	public function fetchUidFromToken($token) {
-		$query = $this->pdo->prepare('SELECT uid FROM auth_tokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return $result['uid'];
+		try {
+			$query = $this->pdo->prepare('SELECT uid FROM auth_tokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return $result['uid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns all the details from a user
 	 * based on the uid
 	 */
 	public function fetchDetailsFromUid($uid) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE uid = :uid');
-		$query->bindParam(':uid', $uid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result;
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result;
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the uid affiliated with the
 	 * email of the user
 	 */
 	public function fetchUidFromEmail($email) {
-		$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE email = :email');
-		$query->bindParam(':email', $email);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result['uid'];
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE email = :email');
+			$query->bindParam(':email', $email);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result['uid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* returns the hash affiliated with the uid
 	 * of the user
 	 */
 	public function fetchHashFromUid($uid) {
-		$query = $this->pdo->prepare('SELECT password FROM auth_users WHERE uid = :uid');
-		$query->bindParam(':uid', $uid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result['password'];
+		try {
+			$query = $this->pdo->prepare('SELECT password FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result['password'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the mojang uuid affiliated with
 	 * the uid of the user
 	 */
 	public function fetchMUuidFromUid($uid) {
-		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE uid = :uid');
-		$query->bindParam(':uid', $uid);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if($result) {
-			return $result['m_uuid'];
+		try {
+			$query = $this->pdo->prepare('SELECT m_uuid FROM auth_users WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if($result) {
+				return $result['m_uuid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Returns the m_uuid affiliated with the token,
 	 * otherwise, just returns false for no token.
 	 */
 	public function fetchMUuid($token) {
-		$query = $this->pdo->prepare('SELECT m_uuid FROM auth_registrationtokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result) {
-			return $result['m_uuid'];
+		try {
+			$query = $this->pdo->prepare('SELECT m_uuid FROM auth_registrationtokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result['m_uuid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	/* Calls to remove the reset token
 	 */
-	public function removeResetToken($token) {
-		$query = $this->pdo->prepare('DELETE FROM auth_resettokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
+	public function removeResetTokens($uid) {
+		try {
+			$query = $this->pdo->prepare('DELETE FROM auth_resettokens WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			return true;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
 	}
 
 	/* Calls to remove the token from the database 
 	 * affiliated with the token data
 	 */
 	public function removeAuthToken($token) {
-		$query = $this->pdo->prepare('DELETE FROM auth_tokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
+		try {
+			$query = $this->pdo->prepare('DELETE FROM auth_tokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			return true;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
 	}
 
 	/* Calls to remove the m_uuid affiliated token
 	 * from auth_tokens
 	 */
 	public function removeRegistrationToken($token) {
-		$query = $this->pdo->prepare('DELETE FROM auth_registrationtokens WHERE token = :token');
-		$query->bindParam(':token', $token);
-		$query->execute();
+		try {
+			$query = $this->pdo->prepare('DELETE FROM auth_registrationtokens WHERE token = :token');
+			$query->bindParam(':token', $token);
+			$query->execute();
+			return true;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
 	}
 
 	public function setup() {
@@ -471,10 +581,10 @@ class DatabaseHandler {
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_registrationtokens(token VARCHAR(16), m_uuid VARCHAR(32), time INTEGER(12), UNIQUE KEY(m_uuid))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_apitokens(access_token VARCHAR(32), client_token VARCHAR(128), uid VARCHAR(32), time INTEGER(12), UNIQUE KEY(access_token))");
 			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_groups(group_level INTEGER(4), group_name VARCHAR(32), level_ingame INTEGER(4), level_irc INTEGER(4), level_logs BOOLEAN, UNIQUE KEY(group_level))");
-			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_resettokens(uid VARCHAR(32), token VARCHAR(16), time INTEGER(12), UNIQUE KEY(uid))");
+			$query = $this->pdo->query("CREATE TABLE IF NOT EXISTS auth_resettokens(uid VARCHAR(32), token VARCHAR(16), time INTEGER(12), UNIQUE KEY(token))");
 			return "Successfully setup the database.";
 		} catch (PDOException $e) {
-			return $e->getMessage();
+			return "Error with setting up database\n" . $e->getMessage();
 		}
 	}
 
@@ -495,7 +605,7 @@ try {
 	$pdo = new PDO('mysql:host=' . DBHOST . ';dbname=' . DBNAME, DBUSER, DBPASS);
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-	echo $e->getMessage();
-	die();
+	error_log($e->getMessage());
+	die("Database initialization error");
 }
 ?>

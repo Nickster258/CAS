@@ -3,7 +3,7 @@
 define("IN_CAS", true);
 
 require_once 'constants.php';
-require_once 'database.php';
+require_once ROOT_DIR . 'includes/database.php';
 
 global $pdo;
 

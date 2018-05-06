@@ -5,8 +5,8 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
-require_once 'database.php';
-require_once 'random.php';
+require_once ROOT_DIR . 'includes/database.php';
+require_once ROOT_DIR . 'includes/random.php';
 
 function is_post() {
 	if(strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'), 'POST') == 0) {

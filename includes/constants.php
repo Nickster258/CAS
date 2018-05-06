@@ -16,6 +16,8 @@ define('EMAIL_PORT', 465);
 define('EMAIL_SENDER', "email@example.com");
 define('EMAIL_SENDER_NAME', "Example Name");
 // General
+define('ROOT_DIR', "/root/directory/of/server/");
+define('SERVICE_NAME', "Service Name");
 define('URL', "https://sub.example.com/");
 define('DOMAIN', "example.com");
 ?>

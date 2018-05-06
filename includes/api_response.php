@@ -5,8 +5,6 @@ if(!defined('IN_CAS')) {
 	die();
 }
 
-require_once 'constants.php';
-
 class ApiResponse {
 
 	public $data;
