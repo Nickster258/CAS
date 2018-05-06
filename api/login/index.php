@@ -1,5 +1,6 @@
 <?php
 
+define('IN_CAS', true);
 require_once 'includes/constants.php';
 require_once ROOT_DIR . 'includes/utilities.php';
 require_once ROOT_DIR . 'includes/database.php';
