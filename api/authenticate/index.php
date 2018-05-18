@@ -30,8 +30,11 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		$request_user = $input->requestUser;
 	}
 
-	$valid_email = is_valid_email($username);
-	if ($valid_email && (strlen($password) > 7)) {
+	$login_name = is_valid_email($username);
+	if (!$login_name) {
+		$login_name = is_valid_username($username);
+	}
+	if ($login_name && (strlen($password) > 7)) {
 		$uid = $handler->fetchUidFromEmail($valid_email);
 		$hash = $handler->fetchHashFromUid($uid);
 		if (password_verify($password, $hash)) {
@@ -79,7 +82,7 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 		new ErrorResponse(
 			400,
 			"Invalid Email Formatting",
-			"The email was formatted incorrectly",
+			"The Email or username was formatted incorrectly",
 			null
 		);
 	}

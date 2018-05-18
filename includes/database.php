@@ -349,10 +349,25 @@ class DatabaseHandler {
 	public function verifyUser($uid) {
 		try {
 			$query = $this->pdo->prepare('UPDATE auth_users SET verified = 1 WHERE uid = :uid');
-			$query->bindPAram(':uid', $uid);
+			$query->bindParam(':uid', $uid);
 			$query->execute();
 			return true;
 		} catch (PDOException $e) {
+			error_log($e->getMessage());
+			return false;
+		}
+	}
+
+	/* Removes the email token
+	 * affiliated with the uid
+	 */
+	public function removeEmailToken($uid) {
+		try {
+			$query = $this->pdo->prepare('DELETE FROM auth_emailtokens WHERE uid = :uid');
+			$query->bindParam(':uid', $uid);
+			$query->execute();
+			return true;
+		} catch (Exception $e) {
 			error_log($e->getMessage());
 			return false;
 		}

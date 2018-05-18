@@ -164,8 +164,13 @@ function logout($handler) {
 }
 
 function verify($handler) {
+	echo "a";
 	if ($uid = $handler->fetchUidFromEmailToken($_GET['token'])) {
+		echo "b";
 		$handler->verifyUser($uid);
+		echo "c";
+		$handler->removeEmailToken($uid);
+		echo "d";
 		new UserResponse("successfulVerification");
 	} else {
 		new UserResponse("invalidEmailToken");
