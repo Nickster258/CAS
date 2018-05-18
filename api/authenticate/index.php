@@ -34,7 +34,7 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 	$is_email = true;
 	if (!$login_name) {
 		$is_email = false;
-		$login_name = is_valid_username($username);
+		$login_name = is_valid_name($username);
 	}
 	if ($login_name && (strlen($password) > 7)) {
 		$uid = '';

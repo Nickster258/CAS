@@ -498,6 +498,7 @@ class DatabaseHandler {
 			$query->execute();
 			$result = $query->fetch(PDO::FETCH_ASSOC);
 			if ($result) {
+				var_dump($result);
 				return $result['uid'];
 			}
 			return false;
