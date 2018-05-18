@@ -487,6 +487,26 @@ class DatabaseHandler {
 		}
 	}
 
+
+	/* Returns the uid affiliated with the 
+	 * username of the user
+	 */
+	public function fetchUidFromName($username) {
+		try {
+			$query = $this->pdo->prepare('SELECT * FROM auth_users WHERE username = :username');
+			$query->bindParam(':username', $username);
+			$query->execute();
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			if ($result) {
+				return $result['uid'];
+			}
+			return false;
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
+	}
+
 	/* returns the hash affiliated with the uid
 	 * of the user
 	 */

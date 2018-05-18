@@ -31,11 +31,18 @@ if (strcmp(filter_input(INPUT_SERVER, 'REQUEST_METHOD'),'POST') != 0) {
 	}
 
 	$login_name = is_valid_email($username);
+	$is_email = true;
 	if (!$login_name) {
+		$is_email = false;
 		$login_name = is_valid_username($username);
 	}
 	if ($login_name && (strlen($password) > 7)) {
-		$uid = $handler->fetchUidFromEmail($valid_email);
+		$uid = '';
+		if($is_email) {
+			$uid = $handler->fetchUidFromEmail($login_name);
+		} else {
+			$uid = $handler->fetchUidFromName($login_name);
+		}
 		$hash = $handler->fetchHashFromUid($uid);
 		if (password_verify($password, $hash)) {
 			if (!$handler->apiClientTokenExists($uid, $client_token)) {
