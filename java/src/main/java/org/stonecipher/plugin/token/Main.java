@@ -34,12 +34,8 @@ public class Main extends JavaPlugin implements Listener{
 		// Only attempts to connect to the database if 
 		setupConfig();
 		if (!username.equals("username")){
-			if(connectToDatabase()) {
-				removeOutdatedTokens();
-				disconnectFromDatabase();
-			} else {
-				getLogger().info("Error with database connection!");
-			}
+			connectToDatabase();
+			removeOutdatedTokens();
 		}
 		
 	}
@@ -49,10 +45,8 @@ public class Main extends JavaPlugin implements Listener{
 	public void onDisable() {
 		
 		if (!username.equals("username")) {
-			if(connectToDatabase()) {
-				removeOutdatedTokens();
-				disconnectFromDatabase();
-			}
+			removeOutdatedTokens();
+			disconnectFromDatabase();
 		}
 		
 	}
@@ -60,47 +54,23 @@ public class Main extends JavaPlugin implements Listener{
 	// Command execution
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		Thread databaseExecution = new Thread(() -> {
-			if (sender instanceof Player){
-				connectToDatabase();
-				Player player = (Player) sender; // Create new player object
-				if (!userIsRegistered(player)) {
-					String uuid = player.getUniqueId().toString(); // Fetch UUID
-					String token = setToken(uuid);
-					if (token!="fail"){ // Set token in the database, returns true upon success	
-						sender.sendMessage("Â§8[Â§7AuthÂ§8] Â§rYour token is Â§e" + token);
-						sender.sendMessage("Â§8[Â§7AuthÂ§8] Â§rVisit https://cas.openredstone.org/register.php?token=" + token + " to register.");
-					} else { // Upon token generation failure
-						sender.sendMessage("Â§8[Â§7AuthÂ§8] Â§rAn error occured, please contact your system administrator.");
-					}
-				} else {
-					sender.sendMessage("Â§8[Â§7AuthÂ§8] Â§rYour account has already been registered.");
-				}
-				disconnectFromDatabase();
-			} else {
-				sender.sendMessage("Â§8[Â§7AuthÂ§8] Â§rThis command can only be ran in-game");
+		if (sender instanceof Player){
+			Player player = (Player) sender; // Create new player object
+			String uuid = player.getUniqueId().toString(); // Fetch UUID
+			String token = setToken(uuid);
+			if (token!="fail"){ // Set token in the database, returns true upon success	
+				sender.sendMessage("§8[§7Auth§8] §rYour token is §e" + token);
+				sender.sendMessage("§8[§7Auth§8] §rVisit https://cas.openredstone.org/register.php?token=" + token + " to register.");
+			} else { // Upon token generation failure
+				sender.sendMessage("§8[§7Auth§8] §rAn error occured, please contact your system administrator.");
 			}
-		});
-		databaseExecution.start();
+			return true;
+		} else {
+			sender.sendMessage("§8[§7Auth§8] §rThis command can only be ran in-game");
+		} 
 		return true;
 	}
 	
-	private boolean userIsRegistered(Player player) {
-		String uuid = player.getUniqueId().toString();
-		uuid = uuid.replace("-", "");
-		try{	
-			String uuidCheck = "SELECT EXISTS(SELECT * FROM auth_users WHERE m_uuid=?);";
-			PreparedStatement tokenCheckPrepared = conn.prepareStatement(uuidCheck);
-			tokenCheckPrepared.setString(1,uuid);
-			ResultSet result = tokenCheckPrepared.executeQuery();
-			result.first();
-			return result.getBoolean(1);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
 	// Sets up the config properly
 	private void setupConfig(){
 		try {
@@ -134,23 +104,19 @@ public class Main extends JavaPlugin implements Listener{
 	}
 	
 	// Safely connects to the database and sets up the table if it isn't set
-	private boolean connectToDatabase() {
+	private void connectToDatabase() {
 		try { 
-			if(conn==null || conn.isClosed()){ 
-				conn = DriverManager.getConnection(url, username, password);
-				String createTable = "CREATE TABLE IF NOT EXISTS auth_registrationtokens (token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(uuid));";
-				try {
-					PreparedStatement table = conn.prepareStatement(createTable);
-					table.executeUpdate();
-					return true;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			conn = DriverManager.getConnection(url, username, password);
+			String createTable = "CREATE TABLE IF NOT EXISTS auth_registrationtokens (token VARCHAR(16), m_uuid VARCHAR(32), time INT, UNIQUE KEY(uuid));";
+			try {
+				PreparedStatement table = conn.prepareStatement(createTable);
+				table.executeUpdate();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
 	}
 	
 	// Safely disconnects from the database
@@ -196,7 +162,7 @@ public class Main extends JavaPlugin implements Listener{
 		uuid = uuid.replace("-", ""); // Removes the dashed from the UUID for VARCHAR(32)
 		removeOutdatedTokens();
 		String token = generateUniqueToken();
-		if(token != null && setUserToken(uuid, token)){
+		if(setUserToken(uuid, token)){
 			return token;
 		} else {
 			return "fail";
@@ -221,13 +187,12 @@ public class Main extends JavaPlugin implements Listener{
 	
 	// Continually generates a token until the token is unique
 	private String generateUniqueToken() {
-		for(int i = 0; i<5; i++) {
+		while(true) {
 			String token = generateToken();
 			if(!tokenExists(token)) {
 				return token;
 			}
 		}
-		return null;
 	}
 	
 	// Simple utility to randomly create a token
